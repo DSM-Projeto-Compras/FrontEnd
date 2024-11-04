@@ -113,16 +113,51 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
               id="category"
               value={filters.category}
               onChange={handleInputChange}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             >
               <option value="">Todas</option>
+              <option value="material-de-escritorio">
+                Material de Escritório
+              </option>
               <option value="equipamentos-de-informatica">
                 Equipamentos de Informática
               </option>
+              <option value="material-de-limpeza">Material de Limpeza</option>
+              <option value="materiais-didaticos-pedagogicos">
+                Materiais Didáticos e Pedagógicos
+              </option>
+              <option value="material-de-escritorio-especializado">
+                Material de Escritório Especializado
+              </option>
+              <option value="equipamentos-de-laboratorio">
+                Equipamentos de Laboratório
+              </option>
+              <option value="material-de-construcao-manutencao">
+                Material de Construção e Manutenção
+              </option>
               <option value="moveis-equipamentos">Móveis e Equipamentos</option>
+              <option value="material-de-higiene-saude">
+                Material de Higiene e Saúde
+              </option>
+              <option value="materiais-para-eventos-projetos-especiais">
+                Materiais para Eventos e Projetos Especiais
+              </option>
+              <option value="materiais-esportivos-educacao-fisica">
+                Materiais Esportivos e Educação Física
+              </option>
               <option value="recursos-tecnologicos-multimidia">
                 Recursos Tecnológicos e Multimídia
               </option>
+              <option value="material-de-arte-design">
+                Material de Arte e Design
+              </option>
+              <option value="material-de-jardinagem-paisagismo">
+                Material de Jardinagem e Paisagismo
+              </option>
+              <option value="material-de-seguranca-prevencao">
+                Material de Segurança e Prevenção
+              </option>
+              <option value="outro">Outro</option>
             </select>
           </div>
 
