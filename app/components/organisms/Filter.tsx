@@ -85,10 +85,10 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
                         status === "Aprovado"
                           ? "green-500"
                           : status === "Pendente"
-                          ? "yellow-300"
+                          ? "yellow-500"
                           : status === "Negado"
                           ? "red-500"
-                          : "blue-300"
+                          : "blue-500"
                       } w-3 h-3 me-3 rounded-full`}
                     ></span>
                     {status || "Todos"}
