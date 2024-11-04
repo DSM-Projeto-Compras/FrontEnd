@@ -13,6 +13,7 @@ interface RequisitionData {
 interface RequisitedData {
   _id: string;
   nome: string;
+  data: string;
   tipo: string;
   quantidade: number;
   categoria: string;

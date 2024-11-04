@@ -76,6 +76,14 @@ const AdminDashboardTemplate: React.FC = () => {
     setFilteredProducts(uniqueFiltered);
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -84,7 +92,7 @@ const AdminDashboardTemplate: React.FC = () => {
           id: item._id,
           name: item.nome,
           description: item.descricao || "",
-          date: new Date().toISOString(),
+          date: item.data,
           status: item.status,
           category: item.categoria,
           type: item.tipo,
@@ -215,7 +223,7 @@ const AdminDashboardTemplate: React.FC = () => {
                     )}
                   </td>
 
-                  <td className="px-6 py-4">{product.date}</td>
+                  <td className="px-6 py-4">{formatDate(product.date)}</td>
                   <td className="px-6 py-4">
                     <span className="flex items-center text-sm font-medium text-gray-900">
                       <span
@@ -227,12 +235,18 @@ const AdminDashboardTemplate: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="font-medium text-blue-600 hover:underline">
-                      Editar
-                    </button>
-                    <button className="font-medium text-red-600 hover:underline ml-4">
-                      Excluir
-                    </button>
+                    {product.status === "Pendente" ? (
+                      <>
+                        <button className="font-medium text-green-600 hover:underline">
+                          Aprovar
+                        </button>
+                        <button className="font-medium text-red-600 hover:underline ml-4">
+                          Negar
+                        </button>
+                      </>
+                    ) : (
+                      " "
+                    )}
                   </td>
                 </tr>
               ))}
