@@ -7,15 +7,15 @@ interface Product {
   id: string;
   name: string;
   description: string;
-  date: string; // ou Date, se você for usar Date
+  date: string;
   status: string;
-  category: string; // se a categoria não for obrigatória
-  type: string; // se o tipo não for obrigatória
+  category: string;
+  type: string;
 }
 
 const AdminDashboardTemplate: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Controle do filtro
-  const [allProducts, setAllProducts] = useState<Product[]>([]); // Armazena os produtos originais
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<FilterValues>({
     name: "",
@@ -26,14 +26,12 @@ const AdminDashboardTemplate: React.FC = () => {
     endDate: "",
   });
 
-  // Função para alternar o filtro
   const toggleFilter = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Função que aplica os filtros
   const applyFilters = () => {
-    let filtered = [...allProducts]; // Use 'allProducts' para manter os dados originais
+    let filtered = [...allProducts];
 
     if (filters.name) {
       filtered = filtered.filter((product) =>
@@ -92,8 +90,8 @@ const AdminDashboardTemplate: React.FC = () => {
           type: item.tipo,
         }));
 
-        setAllProducts(products); // Armazena os produtos originais
-        setFilteredProducts(products); // Inicializa os produtos filtrados com todos os produtos
+        setAllProducts(products);
+        setFilteredProducts(products);
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
       }
@@ -106,7 +104,6 @@ const AdminDashboardTemplate: React.FC = () => {
     applyFilters();
   }, [filters]);
 
-  // Função para resetar os filtros
   const resetFilters = () => {
     setFilters({
       name: "",
@@ -116,25 +113,23 @@ const AdminDashboardTemplate: React.FC = () => {
       startDate: "",
       endDate: "",
     });
-    setFilteredProducts(allProducts); // Reseta os produtos filtrados para os originais
+    setFilteredProducts(allProducts);
   };
 
-  // Função para verificar se o texto é muito longo
   const isTextTooLong = (text: string) => {
     return text.length > 20;
   };
 
-  // Função para renderizar o status com uma cor diferente
   const renderStatusDot = (status: string) => {
     switch (status) {
       case "Aprovado":
-        return "bg-green-500"; // Verde para aprovado
+        return "bg-green-500";
       case "Pendente":
-        return "bg-yellow-500"; // Amarelo para pendente
+        return "bg-yellow-500";
       case "Negado":
-        return "bg-red-500"; // Vermelho para negado
+        return "bg-red-500";
       default:
-        return "bg-gray-500"; // Cinza para status desconhecido
+        return "bg-gray-500";
     }
   };
 
@@ -202,18 +197,8 @@ const AdminDashboardTemplate: React.FC = () => {
                 <tr key={product.id} className="bg-white border-b">
                   <td className="px-6 py-4">
                     {isTextTooLong(product.name) ? (
-                      <span className="flex font-medium cursor-pointer">
+                      <span className="flex font-medium">
                         {product.name.slice(0, 20)}... &nbsp;
-                        <svg
-                          className="w-3 h-3 text-gray-800"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="currentColor"
-                          viewBox="0 0 18 18"
-                        >
-                          <path d="M17 0h-5.768a1 1 0 1 0 0 2h3.354L8.4 8.182A1.003 1.003 0 1 0 9.818 9.6L16 3.414v3.354a1 1 0 0 0 2 0V1a1 1 0 0 0-1-1Z" />
-                          <path d="m14.258 7.985-3.025 3.025A3 3 0 1 1 6.99 6.768l3.026-3.026A3.01 3.01 0 0 1 8.411 2H2.167A2.169 2.169 0 0 0 0 4.167v11.666A2.169 2.169 0 0 0 2.167 18h11.666A2.169 2.169 0 0 0 16 15.833V9.589a3.011 3.011 0 0 1-1.742-1.604Z" />
-                        </svg>
                       </span>
                     ) : (
                       <span className="font-medium">{product.name}</span>
@@ -222,18 +207,8 @@ const AdminDashboardTemplate: React.FC = () => {
 
                   <td className="px-6 py-4">
                     {isTextTooLong(product.description) ? (
-                      <span className="flex cursor-pointer">
+                      <span className="flex">
                         {product.description.slice(0, 20)}... &nbsp;
-                        <svg
-                          className="w-3 h-3 text-gray-800"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="currentColor"
-                          viewBox="0 0 18 18"
-                        >
-                          <path d="M17 0h-5.768a1 1 0 1 0 0 2h3.354L8.4 8.182A1.003 1.003 0 1 0 9.818 9.6L16 3.414v3.354a1 1 0 0 0 2 0V1a1 1 0 0 0-1-1Z" />
-                          <path d="m14.258 7.985-3.025 3.025A3 3 0 1 1 6.99 6.768l3.026-3.026A3.01 3.01 0 0 1 8.411 2H2.167A2.169 2.169 0 0 0 0 4.167v11.666A2.169 2.169 0 0 0 2.167 18h11.666A2.169 2.169 0 0 0 16 15.833V9.589a3.011 3.011 0 0 1-1.742-1.604Z" />
-                        </svg>
                       </span>
                     ) : (
                       <span>{product.description}</span>
@@ -242,11 +217,12 @@ const AdminDashboardTemplate: React.FC = () => {
 
                   <td className="px-6 py-4">{product.date}</td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`inline-block px-2 py-1 text-xs font-semibold text-white rounded-full ${renderStatusDot(
-                        product.status
-                      )}`}
-                    >
+                    <span className="flex items-center text-sm font-medium text-gray-900">
+                      <span
+                        className={`w-3 h-3 me-3 rounded-full ${renderStatusDot(
+                          product.status
+                        )}`}
+                      ></span>
                       {product.status}
                     </span>
                   </td>
