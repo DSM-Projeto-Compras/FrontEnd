@@ -22,4 +22,4 @@ ENV MONGODB_INITDB_DATABASE=projetocompras
 EXPOSE 3000
 
 # Comando utilizado para iniciar a aplicação
-CMD [ "next", "dev" ]
+CMD [ "npm", "run", "dev" ]
