@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+    networks:
+      - rede_compras
+
+  # #backend
+  # back_end:
+  #   image: 
+  #   build:
+  #     context: 
+  #     dockerfile: Dockerfile
+  #   container_name: back_end
+  #   environment:
+  #     
+  #   depends_on:
+  #     - mongo
+  #   ports:
+  #     - "4000:4000"
+  #   networks:
+  #     - rede_compras
+
+networks:
+  rede_compras:
+    driver: bridge

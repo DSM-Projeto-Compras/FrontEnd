@@ -1,5 +1,5 @@
 # Imagem node
-FROM node:14
+FROM node:20
 
 # Diretório dos arquivos no container
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Compila a aplicação para produção
-RUN npm run build
+# RUN npm run build
 
 # Criando algumas variáveis de ambiente
 #ENV MONGODB_INITDB_ROOT_USERNAME=user
@@ -22,7 +22,7 @@ RUN npm run build
 #ENV MONGODB_INITDB_DATABASE=projetocompras
 
 # Porta exposta em que a aplicação roda
-EXPOSE 80
+EXPOSE 3000
 
 # Comando utilizado para iniciar a aplicação
 CMD [ "npm", "run", "dev" ]
