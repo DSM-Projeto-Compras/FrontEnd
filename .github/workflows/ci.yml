@@ -3,7 +3,7 @@ name: Versionamento
 on:
   push:
     branches:
-      - master  # Alterado para master, conforme instruções
+      - master # Alterado para master, conforme instruções
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: "20"
 
       - name: Instalar dependências
         run: npm install
@@ -91,7 +91,7 @@ jobs:
 
       - name: Atualizar versão no package.json
         run: |
-          npm version ${{ env.new_version }} --no-git-tag-version
+          npm version ${{ steps.version.outputs.new_version }} --no-git-tag-version --allow-same-version
 
       - name: Commit e push
         env:
