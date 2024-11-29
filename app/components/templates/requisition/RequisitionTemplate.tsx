@@ -10,13 +10,7 @@ import RequisitionService from "../../../services/requisitionService";
 import SearchBecService from "../../../services/searchBecService";
 import Header from "../../organisms/Header";
 
-interface RequisitionTemplateProps {
-  onLogout: () => void;
-}
-
-const RequisitionTemplate: React.FC<RequisitionTemplateProps> = ({
-  onLogout,
-}) => {
+const RequisitionTemplate: React.FC = () => {
   const [productSuggestions, setProductSuggestions] = useState<string[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
     null

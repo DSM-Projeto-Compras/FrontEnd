@@ -9,6 +9,8 @@ const Home = () => {
   useEffect(() => {
     router.push("pages/login");
   }, [router]);
+
+  return null;
 };
 
 export default Home;

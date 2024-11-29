@@ -1,6 +1,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Logo from "../molecules/Logo";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface HeaderProps {
   admin: boolean;
@@ -8,12 +9,12 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ admin = true }) => {
   const router = useRouter();
+  const { logout } = useAuth();
 
   const fazerLogout = () => {
-    localStorage.removeItem("access_token");
-    router.push("login");
+    logout();
+    router.push("/login");
   };
-
   const navigateTo = (path: string) => {
     router.push(path);
   };
