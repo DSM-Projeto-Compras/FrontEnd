@@ -1,6 +1,6 @@
 import React from "react";
 import { useFormik } from "formik";
-import { registerValidationSchema } from "@/app/validators/registerValidation";
+import { registerValidationSchema } from "../../../validators/registerValidation";
 import Header from "../../molecules/HeaderLogin";
 
 const RegisterTemplate: React.FC<{
