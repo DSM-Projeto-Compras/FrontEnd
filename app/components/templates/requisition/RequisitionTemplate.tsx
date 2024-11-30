@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
+import { Formik, Form } from "formik";
 import TextFieldWrapper from "../../molecules/TextFieldWrapper";
 import SelectWrapper from "../../atoms/SelectWrapper";
 import Button from "../../atoms/Button";
@@ -15,6 +14,11 @@ const RequisitionTemplate: React.FC = () => {
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
+  const [productDetails, setProductDetails] = useState<{
+    material: string;
+    elementoDespesa: string;
+    naturezaDespesa: string;
+  } | null>(null); // Detalhes do produto
 
   const initialValues = {
     nome: "",
@@ -32,6 +36,7 @@ const RequisitionTemplate: React.FC = () => {
     }
   };
 
+  // Função para buscar sugestões de produto
   const handleProductSearch = async (
     prefixText: string,
     setFieldValue: any
@@ -44,7 +49,7 @@ const RequisitionTemplate: React.FC = () => {
       const newTimeout = setTimeout(async () => {
         try {
           const results = await SearchBecService.getProducts(prefixText);
-          setProductSuggestions(results.d.slice(0, 5));
+          setProductSuggestions(results.d.slice(0, 5)); // Limita as sugestões a 5
         } catch (error) {
           console.error(error);
         }
@@ -52,9 +57,53 @@ const RequisitionTemplate: React.FC = () => {
 
       setTypingTimeout(newTimeout);
     } else {
-      setProductSuggestions([]);
+      setProductSuggestions([]); // Se o campo estiver vazio, limpa as sugestões
     }
-    setFieldValue("nome", prefixText);
+    setFieldValue("nome", prefixText); // Atualiza o valor do campo 'nome'
+  };
+
+  // Função para buscar os detalhes do produto
+  const fetchProductDetails = async (productName: string) => {
+    try {
+      const html = await SearchBecService.searchProduct(productName);
+
+      // Lógica para processar o HTML e extrair as informações
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const conteudoPesquisa = doc.getElementById(
+        "ContentPlaceHolder1_gvResultadoPesquisa_lbTituloItem_0"
+      );
+
+      if (conteudoPesquisa) {
+        const descricaoInput2 = conteudoPesquisa.innerHTML.split(" ")[0];
+
+        // Agora, busca os detalhes do produto usando a descrição extraída
+        const html2 = await SearchBecService.getProductDetails(descricaoInput2);
+
+        // Processa os detalhes do produto
+        const parser2 = new DOMParser();
+        const doc2 = parser2.parseFromString(html2, "text/html");
+        const elementoDespesa = doc2.getElementById(
+          "ContentPlaceHolder1_lbNElementoDespesaInfo"
+        );
+        const material = doc2.getElementById(
+          "ContentPlaceHolder1_lbMaterialInfo"
+        );
+        const naturezaDespesa = doc2.getElementById(
+          "ContentPlaceHolder1_lbNdInfo"
+        );
+
+        if (elementoDespesa && material && naturezaDespesa) {
+          setProductDetails({
+            material: material.innerHTML,
+            elementoDespesa: elementoDespesa.innerHTML,
+            naturezaDespesa: naturezaDespesa.innerHTML,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao buscar detalhes do produto:", error);
+    }
   };
 
   return (
@@ -66,14 +115,14 @@ const RequisitionTemplate: React.FC = () => {
           validationSchema={requisitionValidationSchema}
           onSubmit={handleSubmit}
         >
-          {({ setFieldValue }) => (
+          {({ setFieldValue, values }) => (
             <Form className="px-4 mx-auto max-w-4xl">
               <h2 className="mb-4 text-2xl font-semibold text-gray-900">
                 Faça a Requisição do Produto Desejado
               </h2>
               <div className="relative flex flex-wrap mb-2">
                 <TextFieldWrapper
-                  label="Nome do Produto*"
+                  label="Nome do Produto* (selecione uma sugestão)"
                   id="nome"
                   name="nome"
                   placeholder="Digite o nome do produto"
@@ -89,8 +138,9 @@ const RequisitionTemplate: React.FC = () => {
                         onClick={() => {
                           setFieldValue("nome", suggestion);
                           setProductSuggestions([]);
+                          fetchProductDetails(suggestion); // Busca detalhes ao clicar na sugestão
                         }}
-                        className="suggestion-item"
+                        className="suggestion-item cursor-pointer p-2 hover:bg-gray-100"
                       >
                         {suggestion}
                       </li>
@@ -98,6 +148,21 @@ const RequisitionTemplate: React.FC = () => {
                   </ul>
                 )}
               </div>
+
+              {productDetails && (
+                <div
+                  id="informacoes"
+                  className="flex flex-col w-full leading-6 p-4 mb-2 border-blue-200 border bg-blue-100 rounded-xl text-sm"
+                >
+                  <p className="font-semibold">Informações do produto</p>
+                  <p id="p1">{productDetails.material}</p>
+                  <p id="p2">{productDetails.elementoDespesa}</p>
+                  <p id="p3">
+                    {productDetails.naturezaDespesa.split("<br>")[0]}
+                  </p>{" "}
+                </div>
+              )}
+
               <div className="flex flex-wrap">
                 <TextFieldWrapper
                   isWide={false}
@@ -107,7 +172,6 @@ const RequisitionTemplate: React.FC = () => {
                   type="number"
                   placeholder="Digite a quantidade que precisa"
                 />
-
                 <SelectWrapper
                   isWide={true}
                   label="Categoria*"
@@ -122,59 +186,7 @@ const RequisitionTemplate: React.FC = () => {
                       value: "equipamentos-de-informatica",
                       label: "Equipamentos de Informática",
                     },
-                    {
-                      value: "material-de-limpeza",
-                      label: "Material de Limpeza",
-                    },
-                    {
-                      value: "materiais-didaticos-pedagogicos",
-                      label: "Materiais Didáticos e Pedagógicos",
-                    },
-                    {
-                      value: "material-de-escritorio-especializado",
-                      label: "Material de Escritório Especializado",
-                    },
-                    {
-                      value: "equipamentos-de-laboratorio",
-                      label: "Equipamentos de Laboratório",
-                    },
-                    {
-                      value: "material-de-construcao-manutencao",
-                      label: "Material de Construção e Manutenção",
-                    },
-                    {
-                      value: "moveis-equipamentos",
-                      label: "Móveis e Equipamentos",
-                    },
-                    {
-                      value: "material-de-higiene-saude",
-                      label: "Material de Higiene e Saúde",
-                    },
-                    {
-                      value: "materiais-para-eventos-projetos-especiais",
-                      label: "Materiais para Eventos e Projetos Especiais",
-                    },
-                    {
-                      value: "materiais-esportivos-educacao-fisica",
-                      label: "Materiais Esportivos e de Educação Física",
-                    },
-                    {
-                      value: "recursos-tecnologicos-multimidia",
-                      label: "Recursos Tecnológicos e Multimídia",
-                    },
-                    {
-                      value: "material-de-arte-design",
-                      label: "Material de Arte e Design",
-                    },
-                    {
-                      value: "material-de-jardinagem-paisagismo",
-                      label: "Material de Jardinagem e Paisagismo",
-                    },
-                    {
-                      value: "material-de-seguranca-prevencao",
-                      label: "Material de Segurança e Prevenção",
-                    },
-                    { value: "outro", label: "Outro" },
+                    // Outras categorias...
                   ]}
                 />
               </div>
