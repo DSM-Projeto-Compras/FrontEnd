@@ -9,6 +9,14 @@ import RequisitionService from "../../../services/requisitionService";
 import SearchBecService from "../../../services/searchBecService";
 import Header from "../../organisms/Header";
 
+interface RequisitionFormValues {
+  nome: string;
+  tipo: string;
+  quantidade: string;
+  categoria: string;
+  descricao: string;
+}
+
 const RequisitionTemplate: React.FC = () => {
   const [productSuggestions, setProductSuggestions] = useState<string[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
@@ -20,14 +28,16 @@ const RequisitionTemplate: React.FC = () => {
     naturezaDespesa: string;
   } | null>(null); // Detalhes do produto
 
-  const initialValues = {
+  const initialValues: RequisitionFormValues = {
     nome: "",
+    tipo: "", // Tipo será atualizado quando os detalhes do produto forem obtidos
     quantidade: "",
     categoria: "",
     descricao: "",
   };
 
   const handleSubmit = async (values: any) => {
+    console.log("Submitting values:", values);
     try {
       await RequisitionService.sendRequisition(values);
       alert("Requisição enviada com sucesso!");
@@ -63,11 +73,13 @@ const RequisitionTemplate: React.FC = () => {
   };
 
   // Função para buscar os detalhes do produto
-  const fetchProductDetails = async (productName: string) => {
+  const fetchProductDetails = async (
+    productName: string,
+    setFieldValue: (field: string, value: any) => void
+  ) => {
     try {
       const html = await SearchBecService.searchProduct(productName);
 
-      // Lógica para processar o HTML e extrair as informações
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
       const conteudoPesquisa = doc.getElementById(
@@ -77,10 +89,8 @@ const RequisitionTemplate: React.FC = () => {
       if (conteudoPesquisa) {
         const descricaoInput2 = conteudoPesquisa.innerHTML.split(" ")[0];
 
-        // Agora, busca os detalhes do produto usando a descrição extraída
         const html2 = await SearchBecService.getProductDetails(descricaoInput2);
 
-        // Processa os detalhes do produto
         const parser2 = new DOMParser();
         const doc2 = parser2.parseFromString(html2, "text/html");
         const elementoDespesa = doc2.getElementById(
@@ -94,11 +104,13 @@ const RequisitionTemplate: React.FC = () => {
         );
 
         if (elementoDespesa && material && naturezaDespesa) {
-          setProductDetails({
+          const newProductDetails = {
             material: material.innerHTML,
             elementoDespesa: elementoDespesa.innerHTML,
             naturezaDespesa: naturezaDespesa.innerHTML,
-          });
+          };
+          setProductDetails(newProductDetails);
+          setFieldValue("tipo", newProductDetails.elementoDespesa); // Atualiza o campo "tipo"
         }
       }
     } catch (error) {
@@ -115,7 +127,7 @@ const RequisitionTemplate: React.FC = () => {
           validationSchema={requisitionValidationSchema}
           onSubmit={handleSubmit}
         >
-          {({ setFieldValue, values }) => (
+          {({ setFieldValue }) => (
             <Form className="px-4 mx-auto max-w-4xl">
               <h2 className="mb-4 text-2xl font-semibold text-gray-900">
                 Faça a Requisição do Produto Desejado
@@ -138,7 +150,7 @@ const RequisitionTemplate: React.FC = () => {
                         onClick={() => {
                           setFieldValue("nome", suggestion);
                           setProductSuggestions([]);
-                          fetchProductDetails(suggestion); // Busca detalhes ao clicar na sugestão
+                          fetchProductDetails(suggestion, setFieldValue);
                         }}
                         className="suggestion-item cursor-pointer p-2 hover:bg-gray-100"
                       >
