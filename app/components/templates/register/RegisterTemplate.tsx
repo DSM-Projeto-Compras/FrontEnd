@@ -1,6 +1,6 @@
 import React from "react";
 import { useFormik } from "formik";
-import { registerValidationSchema } from "@/app/validators/registerValidation";
+import { registerValidationSchema } from "../../../../app/validators/registerValidation";
 import Header from "../../molecules/HeaderLogin";
 
 const RegisterTemplate: React.FC<{
@@ -66,6 +66,7 @@ const RegisterTemplate: React.FC<{
                         type="text"
                         name="name"
                         id="name"
+                        data-testid="name"
                         placeholder="Nome completo"
                         value={formik.values.name}
                         onChange={formik.handleChange}
@@ -94,6 +95,7 @@ const RegisterTemplate: React.FC<{
                         type="email"
                         name="email"
                         id="email"
+                        data-testid="email"
                         placeholder="usuario@email.com"
                         value={formik.values.email}
                         onChange={formik.handleChange}
@@ -122,6 +124,7 @@ const RegisterTemplate: React.FC<{
                         type="password"
                         name="password"
                         id="password"
+                        data-testid="password"
                         placeholder="••••••••"
                         value={formik.values.password}
                         onChange={formik.handleChange}
@@ -150,6 +153,7 @@ const RegisterTemplate: React.FC<{
                         type="password"
                         name="confirmPassword"
                         id="confirmPassword"
+                        data-testid="confirmPassword"
                         placeholder="••••••••"
                         value={formik.values.confirmPassword}
                         onChange={formik.handleChange}
@@ -171,6 +175,7 @@ const RegisterTemplate: React.FC<{
 
                     <button
                       type="submit"
+                      data-testid="btnRegister"
                       className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
                       Criar conta
