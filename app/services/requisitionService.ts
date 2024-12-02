@@ -10,6 +10,18 @@ interface RequisitionData {
   descricao?: string;
 }
 
+interface EditData {
+  _id: string;
+  quantidade: number;
+  descricao: string;
+}
+
+interface EditDataStatus {
+  _id: string;
+  status: string;
+  justificativa: string;
+}
+
 interface RequisitedData {
   _id: string;
   nome: string;
@@ -19,6 +31,21 @@ interface RequisitedData {
   categoria: string;
   status: string;
   descricao?: string;
+}
+
+interface RequisitedDataAdmin {
+  _id: string;
+  nome: string;
+  data: string;
+  tipo: string;
+  quantidade: number;
+  categoria: string;
+  status: string;
+  descricao?: string;
+  userId: {
+    _id: string;
+    nome: string;
+  };
 }
 
 class RequisitionService {
@@ -53,7 +80,7 @@ class RequisitionService {
   }
 
   // para admin
-  async getAllProducts(): Promise<RequisitedData[]> {
+  async getAllProducts(): Promise<RequisitedDataAdmin[]> {
     try {
       const token = localStorage.getItem("access_token");
       const response = await axios.get(`${apiUrl}/all`, {
@@ -68,10 +95,10 @@ class RequisitionService {
     }
   }
 
-  async updateProduct(id: string, data: RequisitionData): Promise<void> {
+  async updateProduct(data: EditData): Promise<void> {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.put(`${apiUrl}/${id}`, data, {
+      await axios.put(`${apiUrl}/`, data, {
         headers: {
           "access-token": token || "",
         },
@@ -94,6 +121,21 @@ class RequisitionService {
       console.log("Produto excluído com sucesso");
     } catch (error) {
       console.error("Erro ao excluir o produto:", error);
+      throw error;
+    }
+  }
+
+  async updateProductStatus(data: EditDataStatus): Promise<void> {
+    try {
+      const token = localStorage.getItem("access_token");
+      await axios.put(`${apiUrl}/aprove/${data._id}`, data, {
+        headers: {
+          "access-token": token || "",
+        },
+      });
+      console.log("Requisição enviada com sucesso");
+    } catch (error) {
+      console.error("Erro ao enviar a requisição:", error);
       throw error;
     }
   }
