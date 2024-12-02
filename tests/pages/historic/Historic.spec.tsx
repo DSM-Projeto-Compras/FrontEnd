@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import mockRouter, { MemoryRouter } from "next-router-mock";
+import mockRouter from "next-router-mock";
 import { setupServer } from "msw/node";
 import { http } from "msw";
 import { env } from "../../../config/env"
@@ -8,24 +8,27 @@ import '@testing-library/jest-dom'
 
 import HistoricTemplate from "../../../app/components/templates/historic/HistoricTemplate"
 import HistoricPage from "../../../app/pages/historic/page";
+import { useRouter } from "next/navigation";
+import Header from "../../../app/components/organisms/Header";
 
 
-jest.mock("next/navigation", () => require("next-router-mock"));
+jest.mock("next/navigation", () => ({
+    useRouter: jest.fn()
+}));
 
 const server = setupServer(
     http.get(`${env.apiBaseUrl}/products`, () => {
-        //com isso não é preciso passar pelo token de autenticação
         
             return Response.json({
                 produtos: [
                     {
-                        "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício para representar o MongoDB
+                        "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
                         "nome": 'Caneta Esferográfica',
                         "tipo": 'material-de-consumo',
                         "quantidade": 100,
                         "categoria": 'material-de-escritorio',
                         "descricao": 'Caneta esferográfica azul para escritório',
-                        "userId": "60d21b4667d0d8992e610c85",  // Exemplo de ObjectId de um usuário
+                        "userId": "60d21b4667d0d8992e610c85",
                         "justificativa": '',
                         "status": "Pendente",
                     },
@@ -46,6 +49,52 @@ const server = setupServer(
     ),
 )
 
+describe("Header Component", () => {
+    //obs: aqui está sendo testado o Header, mas levando em consideração que está com uma estrutura única para a página de Histórico
+    let mockPush: jest.Mock;
+
+    beforeEach(() => {
+        mockPush = jest.fn();
+        (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+
+        jest.spyOn(Storage.prototype, 'removeItem')
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    })
+
+    it("should logout", () => {
+        render(<Header admin={true} />);
+
+        const botaoSair = screen.getByRole('button', { name: /sair/i });
+        fireEvent.click(botaoSair);
+
+        expect(localStorage.removeItem).toHaveBeenCalledWith('access_token');
+
+        expect(mockPush).toHaveBeenCalledWith('login');
+    })
+
+    it("should change page and display logos", async () => {
+        render(<Header admin={false} />);
+
+        screen.getByRole('img', {
+            name: /logo fatec/i
+        })
+        screen.getByRole('img', {
+            name: /logo cps/i
+        })
+
+        const abaProdutos = screen.getByText(/cadastrar produto/i);
+        const abaHistorico = screen.getByText(/histórico/i);
+
+        fireEvent.click(await abaProdutos);
+        expect(mockPush).toHaveBeenCalledWith('requisition');
+
+        fireEvent.click(await abaHistorico);
+        expect(mockPush).toHaveBeenCalledWith('historic')
+    })
+})
 
 describe("Products List Page", () => {
         beforeAll(() => {
