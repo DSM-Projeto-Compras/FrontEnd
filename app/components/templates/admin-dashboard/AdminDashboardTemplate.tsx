@@ -17,6 +17,9 @@ interface Product {
 }
 
 const AdminDashboardTemplate: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<number>(1); // Página atual
+  const [productsPerPage] = useState<number>(7); // Número de produtos por página
+
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false); // Estado para o filtro
   const [activeProductMenu, setActiveProductMenu] = useState<string | null>(
     null
@@ -31,6 +34,16 @@ const AdminDashboardTemplate: React.FC = () => {
     startDate: "",
     endDate: "",
   });
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
@@ -307,7 +320,7 @@ const AdminDashboardTemplate: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product) => (
+              {currentProducts.map((product) => (
                 <tr key={product.id} className="bg-white border-b">
                   <td className="px-6 py-4">
                     {isTextTooLong(product.user) ? (
@@ -459,6 +472,25 @@ const AdminDashboardTemplate: React.FC = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+          >
+            Anterior
+          </button>
+          <span className="text-sm text-gray-500">
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+          >
+            Próximo
+          </button>
         </div>
       </div>
 

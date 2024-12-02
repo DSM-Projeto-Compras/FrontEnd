@@ -13,7 +13,7 @@ const Header: React.FC<HeaderProps> = ({ admin = true }) => {
 
   const fazerLogout = () => {
     logout();
-    router.push("/login");
+    router.push("pages/login");
   };
   const navigateTo = (path: string) => {
     router.push(path);
