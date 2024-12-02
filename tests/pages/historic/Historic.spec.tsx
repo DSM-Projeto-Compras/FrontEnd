@@ -10,11 +10,43 @@ import HistoricTemplate from "../../../app/components/templates/historic/Histori
 import HistoricPage from "../../../app/pages/historic/page";
 import { useRouter } from "next/navigation";
 import Header from "../../../app/components/organisms/Header";
+import requisitionService from "../../../app/services/requisitionService";
 
 
 jest.mock("next/navigation", () => ({
     useRouter: jest.fn()
 }));
+
+jest.mock("../../../app/services/requisitionService", () => ({
+    getProducts: jest.fn().mockResolvedValue({
+        produtos: [
+            {
+                "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
+                "nome": 'Caneta Esferográfica',
+                "tipo": 'material-de-consumo',
+                "quantidade": 100,
+                "categoria": 'material-de-escritorio',
+                "descricao": 'Caneta esferográfica azul para escritório',
+                "data": "2023-12-01T10:00:00.000Z",
+                "userId": "60d21b4667d0d8992e610c85",
+                "justificativa": '',
+                "status": "Pendente",
+            },
+            {
+                "_id": "609c1f1f1b8c8b3a85f4d5f6",
+                "nome": 'Papel sulfite',
+                "tipo": 'material-de-consumo',
+                "quantidade": 50,
+                "categoria": 'material-de-escritorio',
+                "descricao": 'Papel sulfite A4 para material escolar',
+                "data": "2023-12-01T10:00:00.000Z",
+                "userId": "60d21b4667d0d8992e610c85",
+                "justificativa": '',
+                "status": "Pendente"
+            }
+        ],
+    })
+}))
 
 const server = setupServer(
     http.get(`${env.apiBaseUrl}/products`, () => {
@@ -28,6 +60,7 @@ const server = setupServer(
                         "quantidade": 100,
                         "categoria": 'material-de-escritorio',
                         "descricao": 'Caneta esferográfica azul para escritório',
+                        "data": "2023-12-01T10:00:00.000Z",
                         "userId": "60d21b4667d0d8992e610c85",
                         "justificativa": '',
                         "status": "Pendente",
@@ -39,6 +72,7 @@ const server = setupServer(
                         "quantidade": 50,
                         "categoria": 'material-de-escritorio',
                         "descricao": 'Papel sulfite A4 para material escolar',
+                        "data": "2023-12-01T10:00:00.000Z",
                         "userId": "60d21b4667d0d8992e610c85",
                         "justificativa": '',
                         "status": "Pendente"
@@ -65,7 +99,7 @@ describe("Header Component", () => {
     })
 
     it("should logout", () => {
-        render(<Header admin={true} />);
+        render(<Header admin={false} />);
 
         const botaoSair = screen.getByRole('button', { name: /sair/i });
         fireEvent.click(botaoSair);
@@ -97,10 +131,11 @@ describe("Header Component", () => {
 })
 
 describe("Products List Page", () => {
-        beforeAll(() => {
+    beforeAll(() => {
         //Antes do teste, resgata o mock definido como acima
         mockRouter.setCurrentUrl("/products")
         server.listen();
+        jest.spyOn(requisitionService, "getProducts")
     });
     afterAll(() => { 
         server.close()
@@ -119,7 +154,7 @@ describe("Products List Page", () => {
         //Pesquisa na tela da página por qualquer texto escrito como abaixo (título h1 definido)
         screen.getByText("Históricos dos produtos requisitados")
         
-        screen.debug()
+        //screen.debug()
     })
 
     it("should open filter button", async () => {
@@ -140,56 +175,25 @@ describe("Products List Page", () => {
         screen.getByLabelText(/data inicial:/i)
     })
 
-    it("should left the historic page", async () => {
-        
+    it("should filter products by name", async () => {
         render(<HistoricPage />);
-
-        await waitFor(() => {
-            screen.findByRole('button', {
-                name: /sair/i
-            })
-            screen.findByText(/cadastrar produto/i)
-        })
-
-        const botaoSair = screen.getByRole('button', {
-            name: /sair/i
-        })
-        screen.debug();
-        fireEvent.click(botaoSair);
-        screen.debug()
-    })
-
-
-    /*it("should filter products by name", async () => {
-        render(<HistoricPage />);
-
-        //vendo primeiro os itens na tabela
-        screen.findByRole("cell", {
-            name: "Caneta"
-        });
-        screen.findByRole("cell", {
-            name: "sulfite"
-        });
-        
-        screen.debug();
-
-        //clicando no botão de filtros
-        const botao = screen.getByRole('button', {
+        const botaoAbrir = screen.getByRole('button', {
             name: /abrir filtro/i
         })
-        fireEvent.click(botao);
 
-        //alterando o filtro para aparecer somente caneta
-        const input = await screen.findByRole('textbox', {  name: /nome/i})
-        fireEvent.change(input, { target: { value: "Caneta"}})
 
-        screen.debug();
+        fireEvent.click(botaoAbrir);
         
-        await screen.findByRole("cell", {
-            name: "Caneta"
-        });
+        const botaoFechar = screen.getByRole('button', {
+            name: /fechar filtro/i
+        })
 
+        const inputName = await screen.findByRole('textbox', {  name: /nome/i})
+
+        fireEvent.change(inputName, {  target: {value: "Caneta"} })
+
+        fireEvent.click(botaoFechar);
         
-    })*/
+    })
 })
 
