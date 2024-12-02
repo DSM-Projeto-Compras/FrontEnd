@@ -10,6 +10,7 @@ import LoginTemplate from "../../../app/components/templates/login/LoginTemplate
 import LoginPage from "../../../app/pages/login/page";
 
 import Router from 'next/router'
+import { AuthProvider } from "../../../app/contexts/AuthContext";
 
 jest.mock('next/router', ()=> ({push: jest.fn()}))
 jest.mock("next/navigation", () => require("next-router-mock"));
@@ -53,7 +54,13 @@ describe("Login Page Elements", () => {
     afterEach(() => server.resetHandlers)
 
     it("should show elements", async () => {
-        render(<LoginPage />);
+        render(
+        <AuthProvider>
+            <LoginPage />
+        </AuthProvider>
+        );
+
+        
     
         const emailField = screen.getByTestId("email");
         const passwordField = screen.getByTestId("password");
@@ -68,17 +75,23 @@ describe("Login Page Elements", () => {
     });
 
 
-    it("should login", async () => {
-        render(<LoginPage />);
+    it.only("should login", async () => {
+        <AuthProvider>
+            <LoginPage />
+        </AuthProvider>
         const credentials = {
             email: "user@email.com",
             senha: "senha@teste"
         }
 
-        const emailField = screen.getByTestId("email");
-        const passwordField = screen.getByTestId("password");
+        
+
+        const emailField = screen.getByLabelText(/email/i)
+        const passwordField = screen.getByLabelText(/senha/i)
         // const rememberField = screen.getByTestId("remember");
-        const btnLogin = screen.getByTestId("btnLogin");
+        const btnLogin = screen.getByRole('button', {
+            name: /fazer login/i
+          })
 
         fireEvent.change(emailField, {target: {value:credentials.email}})
         fireEvent.change(passwordField, {target: {value:credentials.senha}})
@@ -88,21 +101,28 @@ describe("Login Page Elements", () => {
 
         fireEvent.click(btnLogin);
 
-        waitFor(() => expect(Router.push).toHaveBeenCalledWith('requisition'), {timeout: 5000, interval: 100})
+        await waitFor(() => expect(Router.push).toHaveBeenCalledWith('requisition'), {timeout: 5000, interval: 100})
     })
 
 
     it("should login admin", async () => {
-        render(<LoginPage />);
+        <AuthProvider>
+            <LoginPage />
+        </AuthProvider>
         const credentials = {
             email: "admin@email.com",
             senha: "senha@teste"
         }
 
+        screen.logTestingPlaygroundURL();
+        screen.debug();
+
         const emailField = screen.getByTestId("email");
         const passwordField = screen.getByTestId("password");
         // const rememberField = screen.getByTestId("remember");
         const btnLogin = screen.getByTestId("btnLogin");
+
+        
 
         fireEvent.change(emailField, {target: {value:credentials.email}})
         fireEvent.change(passwordField, {target: {value:credentials.senha}})
@@ -116,7 +136,9 @@ describe("Login Page Elements", () => {
     })
 
     it("should throu an error", async () => {
-        render(<LoginPage />);
+        <AuthProvider>
+            <LoginPage />
+        </AuthProvider>
         const credentials = {
             email: "erro@email.com",
             senha: "senha@teste"
