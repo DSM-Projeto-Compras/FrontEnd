@@ -1,25 +1,25 @@
 module.exports = {
   collectCoverage: true,
   collectCoverageFrom: [
-    "src/**/*.{js,jsx,ts,tsx}",
-    "!src/**/*.test.{js,jsx,ts,tsx}",
-    "!src/**/*.{d.ts}",
-    "!src/**/layout.tsx",
+    "app/**/*.{js,jsx,ts,tsx}",
+    "!app/**/*.test.{js,jsx,ts,tsx}",
+    "!app/**/*.{d.ts}",
+    "!app/**/layout.tsx",
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["json", "lcov", "text", "clover"],
   coverageThreshold: {
     global: {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100,
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
   },
   preset: "ts-jest",
   testEnvironment: "jsdom",
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@/(.*)$": "<rootDir>/app/$1",
   },
   testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
   transform: {

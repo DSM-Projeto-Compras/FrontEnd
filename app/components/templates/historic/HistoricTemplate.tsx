@@ -143,7 +143,7 @@ const HistoricTemplate: React.FC = () => {
 
   return (
     <>
-      <Header admin={false} />
+      <Header admin={false} data-test-id="productList"/>
       <div className="p-4 mx-auto max-w-5xl pt-28 mb-14">
         <div className="relative overflow shadow-md sm:rounded-lg">
           <div className="flex flex-wrap mb-2">
@@ -180,7 +180,7 @@ const HistoricTemplate: React.FC = () => {
             />
           )}
 
-          <table className="w-full text-sm text-left text-gray-500" data-test-id="productList">
+          <table className="w-full text-sm text-left text-gray-500">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-3">
