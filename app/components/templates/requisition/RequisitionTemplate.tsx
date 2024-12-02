@@ -4,14 +4,12 @@ import TextFieldWrapper from "../../molecules/TextFieldWrapper";
 import SelectWrapper from "../../atoms/SelectWrapper";
 import Button from "../../atoms/Button";
 import TextAreaField from "../../atoms/TextAreaField";
-<<<<<<< HEAD
+
 import { requisitionValidationSchema } from "../../../validators/requisitionValidation";
 import RequisitionService from "../../../services/requisitionService"
-=======
-import { requisitionValidationSchema } from "@/app/validators/requisitionValidation";
-import RequisitionService from "../../../services/requisitionService";
+
 import SearchBecService from "../../../services/searchBecService";
->>>>>>> development
+
 import Header from "../../organisms/Header";
 
 interface RequisitionFormValues {
