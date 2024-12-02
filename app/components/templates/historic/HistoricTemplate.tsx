@@ -30,6 +30,15 @@ const HistoricTemplate: React.FC = () => {
     endDate: "",
   });
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editDescription, setEditDescription] = useState<string>("");
+  const [editQuantity, setEditQuantity] = useState<number>(0);
+
   const menuRef = useRef<HTMLDivElement | null>(null); // Ref para o menu de opções
   const buttonRef = useRef<HTMLButtonElement | null>(null); // Ref para o botão que abre o menu
 
@@ -93,6 +102,70 @@ const HistoricTemplate: React.FC = () => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+  };
+
+  const openEditModal = (product: Product) => {
+    setEditingProduct(product);
+    setEditDescription(product.description);
+    setEditQuantity(product.quantity);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingProduct(null);
+  };
+
+  const openDetailModal = (product: Product) => {
+    setViewingProduct(product); // Configura o produto correto
+    setIsDetailModalOpen(true); // Abre o modal
+    setActiveProductMenu(null);
+  };
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false); // Fecha o modal
+    setViewingProduct(null); // Limpa o estado de visualização
+  };
+
+  const handleEditSubmit = async () => {
+    if (editingProduct) {
+      try {
+        // Chama o service para atualizar o produto
+        console.log(editingProduct.id);
+        await RequisitonService.updateProduct({
+          _id: editingProduct.id,
+          descricao: editDescription,
+          quantidade: editQuantity,
+        });
+
+        // Atualiza o estado local com o produto editado
+        setAllProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.id === editingProduct.id
+              ? {
+                  ...product,
+                  description: editDescription,
+                  quantity: editQuantity,
+                }
+              : product
+          )
+        );
+        setFilteredProducts((prevFilteredProducts) =>
+          prevFilteredProducts.map((product) =>
+            product.id === editingProduct.id
+              ? {
+                  ...product,
+                  description: editDescription,
+                  quantity: editQuantity,
+                }
+              : product
+          )
+        );
+        closeEditModal();
+      } catch (error) {
+        console.error("Erro ao editar produto:", error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -319,7 +392,7 @@ const HistoricTemplate: React.FC = () => {
                           {/* Condicional para as opções de acordo com o status */}
                           <li>
                             <a
-                              href="#"
+                              onClick={() => openDetailModal(product)}
                               className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
                             >
                               Ver detalhes
@@ -329,7 +402,7 @@ const HistoricTemplate: React.FC = () => {
                             <>
                               <li>
                                 <a
-                                  href="#"
+                                  onClick={() => openEditModal(product)}
                                   className="flex cursor-pointer px-4 py-2 text-sm text-blue-700 hover:bg-gray-200"
                                 >
                                   Editar &nbsp;
@@ -384,10 +457,7 @@ const HistoricTemplate: React.FC = () => {
                           )}
                           {product.status === "Negado" && (
                             <li>
-                              <a
-                                href="#"
-                                className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
-                              >
+                              <a className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200">
                                 Ver justificativa &nbsp;
                               </a>
                             </li>
@@ -402,6 +472,104 @@ const HistoricTemplate: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {isEditModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+          <div className="bg-white p-6 rounded-lg w-[600px]">
+            {" "}
+            {/* Largura fixa de 500px */}
+            <h2 className="text-xl font-bold mb-4">Editar Produto</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Quantidade
+              </label>
+              <input
+                type="number"
+                value={editQuantity}
+                onChange={(e) => setEditQuantity(Number(e.target.value))}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Descrição
+              </label>
+              <textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                rows={4} // Controla a altura do textarea (4 linhas de altura)
+                className="mt-1 p-2 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md resize-none"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={handleEditSubmit}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md mr-2"
+              >
+                Salvar
+              </button>
+              <button
+                onClick={closeEditModal}
+                className="bg-gray-400 text-white px-4 py-2 rounded-md"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDetailModalOpen && viewingProduct && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+          <div className="bg-white p-6 rounded-lg w-[600px]">
+            {/* Largura fixa de 600px */}
+            <h2 className="text-xl font-bold mb-4">Detalhes do Produto</h2>
+            <div className="mb-4">
+              <p className="block text-sm font-medium text-gray-700">
+                <strong>Nome:</strong> {viewingProduct?.name}
+              </p>
+            </div>
+            <div className="mb-4">
+              <p className="block text-sm font-medium text-gray-700">
+                <strong>Quantidade:</strong> {viewingProduct?.quantity}
+              </p>
+            </div>
+            <div className="mb-4">
+              <p className="block text-sm font-medium text-gray-700">
+                <strong>Descrição:</strong> {viewingProduct?.description}
+              </p>
+            </div>
+            <div className="mb-4">
+              <p className="block text-sm font-medium text-gray-700">
+                <strong>Data:</strong> {formatDate(viewingProduct?.date)}
+              </p>
+            </div>
+            <div className="mb-4">
+              <p className="block text-sm font-medium text-gray-700">
+                <strong>Status:</strong> {viewingProduct?.status}
+              </p>
+            </div>
+            <div className="mb-4">
+              <p className="block text-sm font-medium text-gray-700">
+                <strong>Categoria:</strong> {viewingProduct?.category}
+              </p>
+            </div>
+            <div className="mb-4">
+              <p className="block text-sm font-medium text-gray-700">
+                <strong>Tipo:</strong> {viewingProduct?.type}
+              </p>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={closeDetailModal}
+                className="bg-gray-400 text-white px-4 py-2 rounded-md"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
