@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import mockRouter from "next-router-mock";
 import { setupServer } from "msw/node";
 import { http } from "msw";
 import { env } from "../../../config/env"
 import '@testing-library/jest-dom'
 
-import HistoricTemplate from "../../../app/components/templates/historic/HistoricTemplate"
 import HistoricPage from "../../../app/pages/historic/page";
 import { useRouter } from "next/navigation";
 import Header from "../../../app/components/organisms/Header";
 import requisitionService from "../../../app/services/requisitionService";
 
-
+jest.mock('next/router', ()=> ({push: jest.fn()}))
 jest.mock("next/navigation", () => ({
     useRouter: jest.fn()
 }));
 
 jest.mock("../../../app/services/requisitionService", () => ({
-    getProducts: jest.fn().mockResolvedValue({
-        produtos: [
+    getProducts: jest.fn().mockResolvedValue(
+        //para ser captado pelo render, não deve estar em um objeto:
+        [
             {
                 "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
                 "nome": 'Caneta Esferográfica',
@@ -28,7 +28,7 @@ jest.mock("../../../app/services/requisitionService", () => ({
                 "categoria": 'material-de-escritorio',
                 "descricao": 'Caneta esferográfica azul para escritório',
                 "data": "2023-12-01T10:00:00.000Z",
-                "userId": "60d21b4667d0d8992e610c85",
+                "userId": "674b5c719cc34fc0cc69a6e2",
                 "justificativa": '',
                 "status": "Pendente",
             },
@@ -40,19 +40,20 @@ jest.mock("../../../app/services/requisitionService", () => ({
                 "categoria": 'material-de-escritorio',
                 "descricao": 'Papel sulfite A4 para material escolar',
                 "data": "2023-12-01T10:00:00.000Z",
-                "userId": "60d21b4667d0d8992e610c85",
+                "userId": "674b5c719cc34fc0cc69a6e2",
                 "justificativa": '',
                 "status": "Pendente"
             }
         ],
-    })
+    )
 }))
 
 const server = setupServer(
     http.get(`${env.apiBaseUrl}/products`, () => {
-        
             return Response.json({
-                produtos: [
+                access_token: "access_token",
+                cargo: "user",
+                products: [
                     {
                         "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
                         "nome": 'Caneta Esferográfica',
@@ -144,7 +145,10 @@ describe("Products List Page", () => {
 
     it("should render product list", async () => {
         //pesquisa a página a partir do Template para construir a "base" para os dados
-        render(<HistoricPage />);
+        //act garante atualizações de estado e espera a render
+        await act( async () => {
+            render(<HistoricPage />);
+        })  
 
         await waitFor(() => {
             screen.findByText("Esfereográfica")
@@ -158,25 +162,35 @@ describe("Products List Page", () => {
     })
 
     it("should open filter button", async () => {
-        render(<HistoricPage />);
+        await act( async () => {
+            render(<HistoricPage />);
+        })
         const botao = screen.getByRole('button', {
             name: /abrir filtro/i
         })
         
         expect(screen.queryByRole('textbox', { name: /nome/i})).not.toBeInTheDocument();
         expect(screen.queryByLabelText(/data inicial:/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('combobox', {  name: /categoria/i})).not.toBeInTheDocument();
 
         fireEvent.click(botao);
 
         //screen.logTestingPlaygroundURL();
 
         screen.getByRole('textbox', {  name: /nome/i})
-
+        screen.getByLabelText(/data inicial:/i)
+        screen.getByRole('combobox', {  name: /categoria/i})
+        screen.getByRole('radio', {
+            name: /pendente/i
+        })
         screen.getByLabelText(/data inicial:/i)
     })
 
     it("should filter products by name", async () => {
-        render(<HistoricPage />);
+        await act( async () => {
+            render(<HistoricPage />);
+        })
+
         const botaoAbrir = screen.getByRole('button', {
             name: /abrir filtro/i
         })
@@ -192,7 +206,10 @@ describe("Products List Page", () => {
 
         fireEvent.change(inputName, {  target: {value: "Caneta"} })
 
+        
         fireEvent.click(botaoFechar);
+        screen.logTestingPlaygroundURL()
+        //await screen.findByText("Caneta Esfereográfica");
         
     })
 })
