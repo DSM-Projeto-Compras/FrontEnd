@@ -3,11 +3,11 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import mockRouter, { MemoryRouter } from "next-router-mock";
 import { setupServer } from "msw/node";
 import { http } from "msw";
-import { env } from "../../config/env"
+import { env } from "../../../config/env"
 import '@testing-library/jest-dom'
 
-import LoginTemplate from "../../app/components/templates/login/LoginTemplate"
-import LoginPage from "../../app/pages/login/page";
+import LoginTemplate from "../../../app/components/templates/login/LoginTemplate"
+import LoginPage from "../../../app/pages/login/page";
 
 import Router from 'next/router'
 
