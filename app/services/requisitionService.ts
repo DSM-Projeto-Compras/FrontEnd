@@ -31,6 +31,7 @@ interface RequisitedData {
   categoria: string;
   status: string;
   descricao?: string;
+  justificativa?: string;
 }
 
 interface RequisitedDataAdmin {
@@ -46,6 +47,7 @@ interface RequisitedDataAdmin {
     _id: string;
     nome: string;
   };
+  justificativa?: string;
 }
 
 class RequisitionService {

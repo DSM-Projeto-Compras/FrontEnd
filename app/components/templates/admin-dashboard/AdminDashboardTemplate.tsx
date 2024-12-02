@@ -13,6 +13,7 @@ interface Product {
   status: string;
   category: string;
   type: string;
+  justification?: string;
 }
 
 const AdminDashboardTemplate: React.FC = () => {
@@ -31,8 +32,60 @@ const AdminDashboardTemplate: React.FC = () => {
     endDate: "",
   });
 
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+
+  const [showJustificationOnly, setShowJustificationOnly] =
+    useState<boolean>(false);
+
   const menuRef = useRef<HTMLDivElement | null>(null); // Ref para o menu de opções
   const buttonRef = useRef<HTMLButtonElement | null>(null); // Ref para o botão que abre o menu
+
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null
+  );
+  const [justification, setJustification] = useState<string>("");
+
+  const openConfirmModal = (productId: string) => {
+    setSelectedProductId(productId);
+    setIsConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setSelectedProductId(null);
+    setJustification("");
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleJustificationChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setJustification(e.target.value);
+  };
+
+  const confirmDisapproval = async () => {
+    setActiveProductMenu(null);
+    if (selectedProductId) {
+      try {
+        await RequisitonService.updateProductStatus({
+          _id: selectedProductId,
+          status: "Negado",
+          justificativa: justification, // Justificativa opcional
+        });
+        const updatedProducts = allProducts.map((product) =>
+          product.id === selectedProductId
+            ? { ...product, status: "Negado" }
+            : product
+        );
+        setAllProducts(updatedProducts);
+        setFilteredProducts(updatedProducts);
+        closeConfirmModal();
+      } catch (error) {
+        console.error("Erro ao negar produto:", error);
+      }
+    }
+  };
 
   const toggleFilter = () => {
     setIsFilterOpen((prev) => !prev); // Alterna o filtro sem interferir no menu de produto
@@ -96,7 +149,20 @@ const AdminDashboardTemplate: React.FC = () => {
     return `${day}/${month}/${year}`;
   };
 
+  const openDetailModal = (product: Product, showJustification: boolean) => {
+    setViewingProduct(product); // Configura o produto correto
+    setShowJustificationOnly(showJustification);
+    setIsDetailModalOpen(true); // Abre o modal
+    setActiveProductMenu(null);
+  };
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false); // Fecha o modal
+    setViewingProduct(null); // Limpa o estado de visualização
+  };
+
   const approve = async (id: string) => {
+    setActiveProductMenu(null);
     try {
       await RequisitonService.updateProductStatus({
         _id: id,
@@ -114,24 +180,6 @@ const AdminDashboardTemplate: React.FC = () => {
     }
   };
 
-  const disapprove = async (id: string) => {
-    try {
-      await RequisitonService.updateProductStatus({
-        _id: id,
-        status: "Negado", // Status negado
-        justificativa: "", // Justificativa vazia
-      });
-      // Atualizar a lista de produtos após a negação
-      const updatedProducts = allProducts.map((product) =>
-        product.id === id ? { ...product, status: "Negado" } : product
-      );
-      setAllProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
-    } catch (error) {
-      console.error("Erro ao negar produto:", error);
-    }
-  };
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -146,6 +194,7 @@ const AdminDashboardTemplate: React.FC = () => {
           status: item.status,
           category: item.categoria,
           type: item.tipo,
+          justification: item.justificativa,
         }));
 
         setAllProducts(products);
@@ -331,7 +380,7 @@ const AdminDashboardTemplate: React.FC = () => {
                           {/* Condicional para as opções de acordo com o status */}
                           <li>
                             <a
-                              href="#"
+                              onClick={() => openDetailModal(product, false)}
                               className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
                             >
                               Ver detalhes
@@ -368,7 +417,7 @@ const AdminDashboardTemplate: React.FC = () => {
                                 <a
                                   href="#"
                                   className="flex cursor-pointer px-4 py-2 text-sm text-red-700 hover:bg-gray-200"
-                                  onClick={() => disapprove(product.id)}
+                                  onClick={() => openConfirmModal(product.id)}
                                 >
                                   Negar &nbsp;
                                   <svg
@@ -395,7 +444,7 @@ const AdminDashboardTemplate: React.FC = () => {
                           {product.status === "Negado" && (
                             <li>
                               <a
-                                href="#"
+                                onClick={() => openDetailModal(product, true)}
                                 className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
                               >
                                 Ver justificativa &nbsp;
@@ -412,6 +461,108 @@ const AdminDashboardTemplate: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {isDetailModalOpen && viewingProduct && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+          <div className="bg-white p-6 rounded-lg w-[600px]">
+            {/* Largura fixa de 600px */}
+            <h2 className="text-xl font-bold mb-4">Detalhes do Produto</h2>
+            {!showJustificationOnly ? (
+              <>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700 break-words">
+                    <strong>Nome:</strong> {viewingProduct?.name}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Quantidade:</strong> {viewingProduct?.quantity}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700 break-words">
+                    <strong>Descrição:</strong> {viewingProduct?.description}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Data:</strong> {formatDate(viewingProduct?.date)}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Status:</strong> {viewingProduct?.status}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Categoria:</strong> {viewingProduct?.category}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Tipo:</strong> {viewingProduct?.type}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="mb-4">
+                <p className="block text-sm font-medium text-gray-700 break-words">
+                  <strong>Justificativa:</strong>{" "}
+                  {viewingProduct?.justification ? (
+                    viewingProduct.justification
+                  ) : (
+                    <span>Nenhuma justificativa fornecida.</span>
+                  )}
+                </p>
+              </div>
+            )}
+            <div className="flex justify-end">
+              <button
+                onClick={closeDetailModal}
+                className="bg-gray-400 text-white px-4 py-2 rounded-md"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmação */}
+      {isConfirmModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Negar Produto</h2>
+            <p>Tem certeza que deseja negar este produto?</p>
+
+            <label className="block mt-4">
+              Justificativa (opcional):
+              <textarea
+                className="w-full mt-2 p-2 border border-gray-300 rounded resize-none"
+                value={justification}
+                onChange={handleJustificationChange}
+                placeholder="Digite uma justificativa (opcional)"
+              />
+            </label>
+
+            <div className="flex justify-end mt-4">
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                onClick={closeConfirmModal}
+              >
+                Cancelar
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={confirmDisapproval}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

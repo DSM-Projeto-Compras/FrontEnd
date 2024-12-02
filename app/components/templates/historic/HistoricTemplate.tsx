@@ -12,6 +12,7 @@ interface Product {
   status: string;
   category: string;
   type: string;
+  justification?: string;
 }
 
 const HistoricTemplate: React.FC = () => {
@@ -34,6 +35,9 @@ const HistoricTemplate: React.FC = () => {
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+
+  const [showJustificationOnly, setShowJustificationOnly] =
+    useState<boolean>(false);
 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editDescription, setEditDescription] = useState<string>("");
@@ -116,8 +120,9 @@ const HistoricTemplate: React.FC = () => {
     setEditingProduct(null);
   };
 
-  const openDetailModal = (product: Product) => {
+  const openDetailModal = (product: Product, showJustification: boolean) => {
     setViewingProduct(product); // Configura o produto correto
+    setShowJustificationOnly(showJustification);
     setIsDetailModalOpen(true); // Abre o modal
     setActiveProductMenu(null);
   };
@@ -181,6 +186,7 @@ const HistoricTemplate: React.FC = () => {
           status: item.status,
           category: item.categoria,
           type: item.tipo,
+          justification: item.justificativa,
         }));
 
         setAllProducts(products);
@@ -392,7 +398,7 @@ const HistoricTemplate: React.FC = () => {
                           {/* Condicional para as opções de acordo com o status */}
                           <li>
                             <a
-                              onClick={() => openDetailModal(product)}
+                              onClick={() => openDetailModal(product, false)}
                               className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
                             >
                               Ver detalhes
@@ -457,7 +463,10 @@ const HistoricTemplate: React.FC = () => {
                           )}
                           {product.status === "Negado" && (
                             <li>
-                              <a className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200">
+                              <a
+                                onClick={() => openDetailModal(product, true)}
+                                className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
+                              >
                                 Ver justificativa &nbsp;
                               </a>
                             </li>
@@ -524,41 +533,56 @@ const HistoricTemplate: React.FC = () => {
           <div className="bg-white p-6 rounded-lg w-[600px]">
             {/* Largura fixa de 600px */}
             <h2 className="text-xl font-bold mb-4">Detalhes do Produto</h2>
-            <div className="mb-4">
-              <p className="block text-sm font-medium text-gray-700">
-                <strong>Nome:</strong> {viewingProduct?.name}
-              </p>
-            </div>
-            <div className="mb-4">
-              <p className="block text-sm font-medium text-gray-700">
-                <strong>Quantidade:</strong> {viewingProduct?.quantity}
-              </p>
-            </div>
-            <div className="mb-4">
-              <p className="block text-sm font-medium text-gray-700">
-                <strong>Descrição:</strong> {viewingProduct?.description}
-              </p>
-            </div>
-            <div className="mb-4">
-              <p className="block text-sm font-medium text-gray-700">
-                <strong>Data:</strong> {formatDate(viewingProduct?.date)}
-              </p>
-            </div>
-            <div className="mb-4">
-              <p className="block text-sm font-medium text-gray-700">
-                <strong>Status:</strong> {viewingProduct?.status}
-              </p>
-            </div>
-            <div className="mb-4">
-              <p className="block text-sm font-medium text-gray-700">
-                <strong>Categoria:</strong> {viewingProduct?.category}
-              </p>
-            </div>
-            <div className="mb-4">
-              <p className="block text-sm font-medium text-gray-700">
-                <strong>Tipo:</strong> {viewingProduct?.type}
-              </p>
-            </div>
+            {!showJustificationOnly ? (
+              <>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700 break-words">
+                    <strong>Nome:</strong> {viewingProduct?.name}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Quantidade:</strong> {viewingProduct?.quantity}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700 break-words">
+                    <strong>Descrição:</strong> {viewingProduct?.description}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Data:</strong> {formatDate(viewingProduct?.date)}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Status:</strong> {viewingProduct?.status}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Categoria:</strong> {viewingProduct?.category}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700">
+                    <strong>Tipo:</strong> {viewingProduct?.type}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="mb-4">
+                <p className="block text-sm font-medium text-gray-700 break-words">
+                  <strong>Justificativa:</strong>{" "}
+                  {viewingProduct?.justification ? (
+                    viewingProduct.justification
+                  ) : (
+                    <span>Nenhuma justificativa fornecida.</span>
+                  )}
+                </p>
+              </div>
+            )}
             <div className="flex justify-end">
               <button
                 onClick={closeDetailModal}
