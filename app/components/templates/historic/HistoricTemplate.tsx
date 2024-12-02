@@ -286,7 +286,7 @@ const HistoricTemplate: React.FC = () => {
 
   return (
     <>
-      <Header admin={false} />
+      <Header admin={false} data-test-id="productList"/>
       <div className="p-4 mx-auto max-w-5xl pt-28 mb-14">
         <div className="relative overflow shadow-md sm:rounded-lg">
           <div className="flex flex-wrap mb-2">
