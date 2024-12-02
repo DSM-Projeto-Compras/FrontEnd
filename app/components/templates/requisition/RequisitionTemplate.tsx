@@ -26,31 +26,44 @@ const RequisitionTemplate: React.FC = () => {
     material: string;
     elementoDespesa: string;
     naturezaDespesa: string;
-  } | null>(null); // Detalhes do produto
+  } | null>(null);
+
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSuggestionSelected, setIsSuggestionSelected] =
+    useState<boolean>(false);
 
   const initialValues: RequisitionFormValues = {
     nome: "",
-    tipo: "", // Tipo será atualizado quando os detalhes do produto forem obtidos
+    tipo: "",
     quantidade: "",
     categoria: "",
     descricao: "",
   };
 
   const handleSubmit = async (values: any) => {
-    console.log("Submitting values:", values);
+    setSuccessMessage(null);
+    setErrorMessage(null);
+
+    // Checa se uma sugestão foi selecionada
+    if (!isSuggestionSelected) {
+      setErrorMessage("Por favor, selecione uma sugestão de produto.");
+      return;
+    }
+
     try {
       await RequisitionService.sendRequisition(values);
-      alert("Requisição enviada com sucesso!");
+      setSuccessMessage("Produto solicitado com sucesso!");
     } catch (error) {
-      alert("Erro ao enviar a requisição.");
+      setErrorMessage("Erro ao enviar a requisição.");
     }
   };
 
-  // Função para buscar sugestões de produto
   const handleProductSearch = async (
     prefixText: string,
     setFieldValue: any
   ) => {
+    setIsSuggestionSelected(false); // Reseta a seleção ao começar a digitar
     if (prefixText.length > 2) {
       if (typingTimeout) {
         clearTimeout(typingTimeout);
@@ -59,7 +72,7 @@ const RequisitionTemplate: React.FC = () => {
       const newTimeout = setTimeout(async () => {
         try {
           const results = await SearchBecService.getProducts(prefixText);
-          setProductSuggestions(results.d.slice(0, 5)); // Limita as sugestões a 5
+          setProductSuggestions(results.d.slice(0, 5));
         } catch (error) {
           console.error(error);
         }
@@ -67,12 +80,11 @@ const RequisitionTemplate: React.FC = () => {
 
       setTypingTimeout(newTimeout);
     } else {
-      setProductSuggestions([]); // Se o campo estiver vazio, limpa as sugestões
+      setProductSuggestions([]);
     }
-    setFieldValue("nome", prefixText); // Atualiza o valor do campo 'nome'
+    setFieldValue("nome", prefixText);
   };
 
-  // Função para buscar os detalhes do produto
   const fetchProductDetails = async (
     productName: string,
     setFieldValue: (field: string, value: any) => void
@@ -110,7 +122,8 @@ const RequisitionTemplate: React.FC = () => {
             naturezaDespesa: naturezaDespesa.innerHTML,
           };
           setProductDetails(newProductDetails);
-          setFieldValue("tipo", newProductDetails.elementoDespesa); // Atualiza o campo "tipo"
+          setFieldValue("tipo", newProductDetails.elementoDespesa);
+          setIsSuggestionSelected(true);
         }
       }
     } catch (error) {
@@ -198,7 +211,59 @@ const RequisitionTemplate: React.FC = () => {
                       value: "equipamentos-de-informatica",
                       label: "Equipamentos de Informática",
                     },
-                    // Outras categorias...
+                    {
+                      value: "material-de-limpeza",
+                      label: "Material de Limpeza",
+                    },
+                    {
+                      value: "materiais-didaticos-pedagogicos",
+                      label: "Materiais Didáticos e Pedagógicos",
+                    },
+                    {
+                      value: "material-de-escritorio-especializado",
+                      label: "Material de Escritório Especializado",
+                    },
+                    {
+                      value: "equipamentos-de-laboratorio",
+                      label: "Equipamentos de Laboratório",
+                    },
+                    {
+                      value: "material-de-construcao-manutencao",
+                      label: "Material de Construção e Manutenção",
+                    },
+                    {
+                      value: "moveis-equipamentos",
+                      label: "Móveis e Equipamentos",
+                    },
+                    {
+                      value: "material-de-higiene-saude",
+                      label: "Material de Higiene e Saúde",
+                    },
+                    {
+                      value: "materiais-para-eventos-projetos-especiais",
+                      label: "Materiais para Eventos e Projetos Especiais",
+                    },
+                    {
+                      value: "materiais-esportivos-educacao-fisica",
+                      label: "Materiais Esportivos e de Educação Física",
+                    },
+                    {
+                      value: "recursos-tecnologicos-multimidia",
+                      label: "Recursos Tecnológicos e Multimídia",
+                    },
+                    {
+                      value: "material-de-arte-design",
+                      label: "Material de Arte e Design",
+                    },
+                    {
+                      value: "material-de-jardinagem-paisagismo",
+                      label: "Material de Jardinagem e Paisagismo",
+                    },
+                    {
+                      value: "material-de-seguranca-prevencao",
+                      label: "Material de Segurança e Prevenção",
+                    },
+                    { value: "outro", label: "Outro" },
                   ]}
                 />
               </div>
@@ -210,7 +275,21 @@ const RequisitionTemplate: React.FC = () => {
                   placeholder="Digite a descrição do produto"
                 />
               </div>
-              <Button type="submit">Enviar</Button>
+              <div className="flex items-center justify-center sm:place-items-start sm:justify-normal">
+                <Button type="submit">Enviar</Button>
+
+                {errorMessage && (
+                  <div className="flex flex-col w-full items-center px-5 py-2.5 ml-5 mt-4 border-red-200 border bg-red-100 rounded-xl text-sm">
+                    <p>{errorMessage}</p>
+                  </div>
+                )}
+
+                {successMessage && (
+                  <div className="flex flex-col w-full items-center px-5 py-2.5 ml-5 mt-4 border-green-200 border bg-green-100 rounded-xl text-sm">
+                    <p>{successMessage}</p>
+                  </div>
+                )}
+              </div>
             </Form>
           )}
         </Formik>
