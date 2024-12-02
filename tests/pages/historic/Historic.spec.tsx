@@ -195,6 +195,7 @@ describe("Products List Page", () => {
             name: /abrir filtro/i
         })
 
+        screen.getByText(/papel sulfite a4 par\.\.\./i)
 
         fireEvent.click(botaoAbrir);
         
@@ -208,8 +209,9 @@ describe("Products List Page", () => {
 
         
         fireEvent.click(botaoFechar);
-        screen.logTestingPlaygroundURL()
-        //await screen.findByText("Caneta Esfereográfica");
+        
+        screen.getByText(/caneta esferográfica\.\.\./i)
+        expect(screen.queryByText("sulfite")).not.toBeInTheDocument();
         
     })
 })
