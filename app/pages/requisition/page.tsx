@@ -1,9 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import RequisitionTemplate from "../../components/templates/requisition/RequisitionTemplate";
+import { useAuth } from "../../contexts/AuthContext";
 
-const handleLogout = () => console.log("teste")
-const RequisitionPage: React.FC = () => <RequisitionTemplate onLogout={handleLogout} />;
+const RequisitionPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("login");
+    }
+  }, [isAuthenticated, router]);
+
+  return isAuthenticated ? <RequisitionTemplate /> : null;
+};
 
 export default RequisitionPage;

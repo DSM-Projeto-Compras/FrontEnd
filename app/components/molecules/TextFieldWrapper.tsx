@@ -8,6 +8,7 @@ interface TextFieldWrapperProps {
   type?: string;
   placeholder?: string;
   isWide?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TextFieldWrapper: React.FC<TextFieldWrapperProps> = ({
@@ -17,6 +18,7 @@ const TextFieldWrapper: React.FC<TextFieldWrapperProps> = ({
   type = "text",
   placeholder,
   isWide,
+  onChange,
 }) => {
   const [field, meta] = useField(name);
 
@@ -39,6 +41,7 @@ const TextFieldWrapper: React.FC<TextFieldWrapperProps> = ({
         type={type}
         placeholder={placeholder}
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        onChange={onChange ? onChange : field.onChange}
       />
       {meta.touched && meta.error ? (
         <div className="text-red-600 text-sm">{meta.error}</div>

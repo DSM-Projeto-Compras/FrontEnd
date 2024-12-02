@@ -37,7 +37,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
   };
 
   return (
-    <div className="origin-top-right absolute right-0 mt-2 w-auto rounded-md shadow-lg bg-white ring-2 ring-black ring-opacity-10 divide-y divide-gray-100">
+    <div className="origin-top-right absolute right-0 mt-2 w-auto rounded-md shadow-lg bg-white ring-2 ring-black ring-opacity-10 divide-y divide-gray-100 z-10">
       <div className="py-1 flex">
         <div className="w-60 px-4">
           {/* Filtro por Nome */}
