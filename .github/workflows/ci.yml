@@ -27,6 +27,11 @@ jobs:
       - name: Instalar semver
         run: npm install -g semver
 
+      - name: Executar testes com Jest
+        run: |
+          npm install --save-dev jest # Garante que jest está instalado
+          npx jest tests/pages --coverage
+          
       - name: Criar nova tag caso não exista
         id: create_initial_tag
         env:
