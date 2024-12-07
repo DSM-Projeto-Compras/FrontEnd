@@ -10,6 +10,7 @@
     "test": "jest --watchAll --verbose"
   },
   "dependencies": {
+    "@hotjar/browser": "^1.0.9",
     "axios": "^1.7.7",
     "cheerio": "^1.0.0",
     "formik": "^2.4.6",
