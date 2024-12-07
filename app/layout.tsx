@@ -1,3 +1,5 @@
+"use client";
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -45,9 +47,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         />
       </Head>
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
