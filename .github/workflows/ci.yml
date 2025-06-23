@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
+      repo_name: ${{ steps.define_repo_name.outputs.repo_name }}
 
     steps:
       - name: Checar repositório
@@ -93,7 +96,7 @@ jobs:
           fi
 
           echo "Nova versão: $NEW_VERSION"
-          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
