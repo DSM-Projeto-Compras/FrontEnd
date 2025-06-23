@@ -95,6 +95,58 @@ jobs:
           echo "Nova versão: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Definir o nome do repositório
+        id: define_repo_name
+        run: |
+          REPO_NAME="${{ github.repository }}"
+          REPO_NAME="${REPO_NAME#*/}"
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV 
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+          echo "Repositório: $REPO_NAME"
+          
+      - name: Verificar e criar repositório no Docker Hub (se necessário)
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          echo "Verificando repositório: $REPO_NAME"
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -u $DOCKERHUB_USERNAME:$DOCKERHUB_TOKEN \
+            "https://hub.docker.com/v2/repositories/$DOCKERHUB_USERNAME/$REPO_NAME/")
+          
+          if [ "$RESPONSE" -eq 404 ]; then
+            echo "Repositório não existe. Criando repositório no Docker Hub..."
+            curl -s -X POST -u $DOCKERHUB_USERNAME:$DOCKERHUB_TOKEN \
+              -H "Content-Type: application/json" \
+              -d '{"name": "'$REPO_NAME'", "is_private": true}' \
+              "https://hub.docker.com/v2/repositories/$DOCKERHUB_USERNAME/"
+            echo "Repositório $REPO_NAME criado com sucesso!"
+          else
+            echo "Repositório $REPO_NAME já existe no Docker Hub."
+          fi
+
+      - name: Criar imagem docker
+        if: steps.version.outputs.should_deploy == 'true'
+        run: |
+          echo "Iniciando build da imagem Docker para o repositório $REPO_NAME"
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:$new_version .
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:$new_version ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:latest
+          
+      - name: Efetuar push da imagem
+        if: steps.version.outputs.should_deploy == 'true'
+        run: |
+          echo "Fazendo push da imagem Docker para o Docker Hub ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:$new_version" 
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:$new_version
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:latest
+
       - name: Atualizar versão no package.json
         run: |
           npm version ${{ steps.version.outputs.new_version }} --no-git-tag-version --allow-same-version
@@ -108,22 +160,84 @@ jobs:
           git add package.json package-lock.json
           git diff --quiet || git commit -m "chore(release): version ${{ env.new_version }}"
           git tag v${{ env.new_version }}
-          git push origin master --tags  # Certifique-se que 'master' é a branch correta
+          git push origin master --tags
 
 
-      - name: Efetuar login no docker hub
-        uses: docker/login-action@v2
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Garante que o job 'build' será executado antes
+  
+    steps:
+      - name: Definir o nome do repositório (caso não exista)
+        if: "!steps.versao.outputs.repo_name"
+        id: define_repo_name
+        run: |
+          REPO_NAME="${{ github.repository }}"
+          REPO_NAME="${REPO_NAME#*/}"
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV 
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+          echo "Repositório: $REPO_NAME"
+  
+      - name: Verificar variáveis finais
+        run: |
+          echo "DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}"
+          echo "REPO_NAME: $REPO_NAME"
+          echo "NEW_VERSION: ${{ needs.build.outputs.new_version }}"
+          IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ needs.build.outputs.new_version }}"
+          echo "Imagem completa: $IMAGE"
+  
+      #- name: Debug de variáveis
+      #  run: |
+      #    echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}"
+      #    echo "REPO_NAME=$REPO_NAME"
+      #    echo "NEW_VERSION=${{ needs.build.outputs.new_version }}"
+      #
+      #    if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ] || [ -z "$REPO_NAME" ] || [ -z "${{ needs.build.outputs.new_version }}" ]; then
+      #      echo "❌ Uma ou mais variáveis estão vazias!"
+      #      exit 1
+      #    fi
+      #
+      #    IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ needs.build.outputs.new_version }}"
+      #    echo "✅ Imagem completa: $IMAGE"
+      #
+      #    CONTAINER="docker run -d -p 80:80 --name $REPO_NAME ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ needs.build.outputs.new_version }}"
+      #    echo "✅ Imagem completa: $CONTAINER"
+  
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.5
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Criar imagem docker
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-frontend:${{ env.new_version }} .
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/frontend-frontend:${{ env.new_version }} ${{ secrets.DOCKERHUB_USERNAME }}/frontend-frontend:latest
-
-      - name: Efetuar push da imagem
-        run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-frontend:${{ env.new_version }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-frontend:latest
-
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            REPO_NAME="${{ needs.build.outputs.repo_name }}"
+            VERSION="${{ needs.build.outputs.new_version }}"
+            IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:$VERSION"
+  
+            echo "🔄 Iniciando deploy da imagem: $IMAGE"
+  
+            # Garantir que o Docker esteja disponível
+            sudo yum update -y || sudo apt update -y
+            sudo systemctl start docker || sudo service docker start
+  
+            # Verificar container existente
+            CONTAINER_ID=$(docker ps -q --filter "name=$REPO_NAME")
+            if [ -n "$CONTAINER_ID" ]; then
+              echo "⚙️ Container atual em execução:"
+              docker inspect --format='{{.Config.Image}}' $CONTAINER_ID
+              echo "🛑 Parando e removendo container atual..."
+              docker rm -f $REPO_NAME || true
+            else
+              echo "ℹ️ Nenhum container atual encontrado com nome: $REPO_NAME"
+            fi
+  
+            echo "🧹 Removendo imagem local antiga, se existir..."
+            docker rmi -f "$IMAGE" || echo "ℹ️ Nenhuma imagem antiga encontrada com a tag: $IMAGE"
+  
+            echo "⬇️ Baixando nova imagem..."
+            docker pull $IMAGE
+  
+            echo "🚀 Subindo novo container... $REPO_NAME $IMAGE"
+            docker run -d -p 80:80 --name $REPO_NAME $IMAGE
