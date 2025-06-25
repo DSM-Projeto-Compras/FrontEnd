@@ -20,7 +20,7 @@ COPY . .
 FROM nginx:stable-alpine
 
 # Copia os arquivos da build do React para o diretório padrão do Nginx
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/out /usr/share/nginx/html
 
 # Copia a configuração personalizada do Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
