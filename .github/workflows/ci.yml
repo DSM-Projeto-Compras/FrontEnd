@@ -151,6 +151,11 @@ jobs:
             echo "Repositório $REPO_NAME já existe no Docker Hub."
           fi
 
+      - name: Criar arquivo .env para build
+        run: |
+          echo "NEXT_PUBLIC_API_BASEURL=${{ secrets.NEXT_PUBLIC_API_BASEURL }}" > .env
+
+
       - name: Criar imagem docker
         if: steps.version.outputs.should_deploy == 'true'
         run: |

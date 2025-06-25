@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUrl = "https://projeto-mvc-restful-server.vercel.app/api/products";
+const apiUrl = `${process.env.NEXT_PUBLIC_API_BASEURL}/products`;
 
 interface RequisitionData {
   nome: string;
