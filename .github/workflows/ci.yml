@@ -46,36 +46,36 @@ jobs:
             git config --global user.email 'github-actions@github.com'
             git tag -a v0.0.0 -m "Initial release"
             git push origin v0.0.0
+          else
+            echo "Tag v0.0.0 já existe — nenhuma ação necessária."
           fi
 
       - name: Calcular nova versão
         id: version
         run: |
           git fetch --tags
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          if [[ ! "$LAST_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          LAST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          if [ -z "$LAST_TAG" ]; then
             LAST_TAG="v0.0.0"
           fi
-
           echo "Versão Atual: $LAST_TAG"
-
+          
           if [ "$LAST_TAG" = "v0.0.0" ]; then
             COMMITS=$(git log --pretty=format:"%s")
           else
             COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s")
           fi
-
+          
           echo "Commits desde a última tag:"
           echo "$COMMITS"
-
+          
           # Inicializando variáveis
           MAJOR=0
           MINOR=0
           PATCH=0
-
+          
           # Analisando mensagens de commit
-          IFS=$'\n'
-          for COMMIT in $COMMITS; do
+          for COMMIT in "$COMMITS"; do
             if [[ "$COMMIT" == *"BREAKING CHANGE"* ]]; then
               MAJOR=1
             elif [[ "$COMMIT" == *"feat"* ]]; then
@@ -84,7 +84,7 @@ jobs:
               PATCH=1
             fi
           done
-
+          
           # Calculando a nova versão usando semver
           CURRENT_VERSION=${LAST_TAG#v}
           NEW_VERSION=$CURRENT_VERSION
@@ -95,9 +95,22 @@ jobs:
           elif [[ $PATCH -eq 1 ]]; then
             NEW_VERSION=$(semver -i patch $CURRENT_VERSION)
           fi
+          
+          echo "Vesões (atual / nova): $CURRENT_VERSION # $NEW_VERSION"
 
-          echo "Nova versão: $NEW_VERSION"
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+          if [ "$CURRENT_VERSION" == "$NEW_VERSION" ]; then
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+            echo "Manter versão atual: $CURRENT_VERSION"
+            echo "new_version=$CURRENT_VERSION" >> $GITHUB_ENV
+            echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "Nova versão: $NEW_VERSION"
+            echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+            echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -112,7 +125,7 @@ jobs:
         id: define_repo_name
         run: |
           REPO_NAME="${{ github.repository }}"
-          REPO_NAME="$(echo "${REPO_NAME#*/}" | tr '[:upper:]' '[:lower:]')"
+          REPO_NAME="${REPO_NAME#*/}"
           echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV 
           echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
           echo "Repositório: $REPO_NAME"
@@ -152,23 +165,21 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:latest
 
       - name: Atualizar versão no package.json
+        if: steps.version.outputs.should_deploy == 'true'
         run: |
-          npm version ${{ steps.version.outputs.new_version }} --no-git-tag-version --allow-same-version
-
+          npm version $new_version --no-git-tag-version
+          
       - name: Commit e push
+        if: steps.version.outputs.should_deploy == 'true'
         env:
           GH_TOKEN: ${{ secrets.TOKEN_GIT }}
-          NEW_VERSION: ${{ steps.version.outputs.new_version }}
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git add package.json package-lock.json
-          git diff --quiet || git commit -m "chore(release): version $NEW_VERSION"
-          git tag v$NEW_VERSION
-          git push origin master --tags
-
-
-
+          git add package.json
+          git commit -m "chore(release): version $new_version"
+          git tag v$new_version
+          git push origin main --tags
 
   deploy:
     runs-on: ubuntu-latest
@@ -180,7 +191,7 @@ jobs:
         id: define_repo_name
         run: |
           REPO_NAME="${{ github.repository }}"
-          REPO_NAME="$(echo "${REPO_NAME#*/}" | tr '[:upper:]' '[:lower:]')"
+          REPO_NAME="${REPO_NAME#*/}"
           echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV 
           echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
           echo "Repositório: $REPO_NAME"
@@ -220,29 +231,28 @@ jobs:
             REPO_NAME="${{ needs.build.outputs.repo_name }}"
             VERSION="${{ needs.build.outputs.new_version }}"
             IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:$VERSION"
-  
+
             echo "🔄 Iniciando deploy da imagem: $IMAGE"
-  
+
             # Garantir que o Docker esteja disponível
             sudo yum update -y || sudo apt update -y
             sudo systemctl start docker || sudo service docker start
-  
+
             # Verificar container existente
             CONTAINER_ID=$(docker ps -q --filter "name=$REPO_NAME")
-            if [ -n "$CONTAINER_ID" ]; then
-              echo "⚙️ Container atual em execução:"
-              docker inspect --format='{{.Config.Image}}' $CONTAINER_ID
-              echo "🛑 Parando e removendo container atual..."
+            # Remover qualquer container (rodando ou parado) com o nome
+            if docker ps -a --format '{{.Names}}' | grep -Eq "^$REPO_NAME$"; then
+              echo "🛑 Removendo container existente (rodando ou parado)..."
               docker rm -f $REPO_NAME || true
             else
-              echo "ℹ️ Nenhum container atual encontrado com nome: $REPO_NAME"
+              echo "ℹ️ Nenhum container (rodando ou parado) encontrado com nome: $REPO_NAME"
             fi
-  
+
             echo "🧹 Removendo imagem local antiga, se existir..."
             docker rmi -f "$IMAGE" || echo "ℹ️ Nenhuma imagem antiga encontrada com a tag: $IMAGE"
-  
+
             echo "⬇️ Baixando nova imagem..."
             docker pull $IMAGE
-  
+
             echo "🚀 Subindo novo container... $REPO_NAME $IMAGE"
             docker run -d -p 80:80 --name $REPO_NAME $IMAGE
