@@ -158,12 +158,13 @@ jobs:
       - name: Commit e push
         env:
           GH_TOKEN: ${{ secrets.TOKEN_GIT }}
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add package.json package-lock.json
-          git diff --quiet || git commit -m "chore(release): version ${{ env.new_version }}"
-          git tag v${{ env.new_version }}
+          git diff --quiet || git commit -m "chore(release): version $NEW_VERSION"
+          git tag v$NEW_VERSION
           git push origin master --tags
 
 
@@ -175,7 +176,7 @@ jobs:
   
     steps:
       - name: Definir o nome do repositório (caso não exista)
-        if: "!steps.versao.outputs.repo_name"
+        if: steps.versao.outputs.repo_name == '' || steps.versao.outputs.repo_name == null
         id: define_repo_name
         run: |
           REPO_NAME="${{ github.repository }}"
