@@ -71,7 +71,8 @@ jobs:
           PATCH=0
 
           # Analisando mensagens de commit
-          for COMMIT in "$COMMITS"; do
+          IFS=$'\n'
+          for COMMIT in $COMMITS; do
             if [[ "$COMMIT" == *"BREAKING CHANGE"* ]]; then
               MAJOR=1
             elif [[ "$COMMIT" == *"feat"* ]]; then
