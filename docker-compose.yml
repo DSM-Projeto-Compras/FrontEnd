@@ -13,8 +13,8 @@ services:
       - .:/app
       - /app/node_modules
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - /etc/letsencrypt/live/projeto-compras-dsm.duckdns.org/fullchain.pem:ro
-      - /etc/letsencrypt/live/projeto-compras-dsm.duckdns.org/privkey.pem:ro
+      - /etc/letsencrypt/live/projeto-compras-dsm.duckdns.org/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro
+      - /etc/letsencrypt/live/projeto-compras-dsm.duckdns.org/privkey.pem:/etc/nginx/certs/privkey.pem:ro
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:4000
     networks:
