@@ -200,9 +200,9 @@ jobs:
       - name: Verificar variáveis finais
         run: |
           echo "DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}"
-          echo "REPO_NAME: $REPO_NAME"
+          echo "REPO_NAME: ${{ needs.build.outputs.repo_name }}"
           echo "NEW_VERSION: ${{ needs.build.outputs.new_version }}"
-          IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ needs.build.outputs.new_version }}"
+          IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/${{ needs.build.outputs.repo_name}}:${{ needs.build.outputs.new_version }}"
           echo "Imagem completa: $IMAGE"
   
       #- name: Debug de variáveis
