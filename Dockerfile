@@ -17,23 +17,23 @@ COPY . .
  RUN npm run build
 
 # Usa a imagem oficial do Nginx (para aws)
-FROM nginx:stable-alpine
+# FROM nginx:stable-alpine
 
 # Copia os arquivos da build do React para o diretório padrão do Nginx
-COPY --from=build /app/out /usr/share/nginx/html
+# COPY --from=build /app/out /usr/share/nginx/html
 
 # Copia a configuração personalizada do Nginx
-COPY nginx.conf /etc/nginx/nginx.conf
+# COPY nginx.conf /etc/nginx/nginx.conf
 
 # Criando algumas variáveis de ambiente
-#ENV MONGODB_INITDB_ROOT_USERNAME=user
-#ENV MONGODB_INITDB_ROOT_PASSWORD=pass
-#ENV MONGODB_INITDB_DATABASE=projetocompras
+ENV MONGODB_INITDB_ROOT_USERNAME=user
+ENV MONGODB_INITDB_ROOT_PASSWORD=pass
+ENV MONGODB_INITDB_DATABASE=projetocompras
 
 # Porta exposta em que a aplicação roda
-#EXPOSE 3000
-EXPOSE 80
+EXPOSE 3000
+# EXPOSE 80
 
 # Comando utilizado para iniciar a aplicação
-#CMD [ "npm", "run", "dev" ]
-CMD ["nginx", "-g", "daemon off;"]
+CMD [ "npm", "run", "dev" ]
+# CMD ["nginx", "-g", "daemon off;"]

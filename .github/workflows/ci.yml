@@ -3,7 +3,7 @@ name: Versionamento
 on:
   push:
     branches:
-      - master # Alterado para master, conforme instruções
+      - master # Alterado para master
 
 jobs:
   build:
@@ -227,45 +227,45 @@ jobs:
       #    CONTAINER="docker run -d -p 80:80 --name $REPO_NAME ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ needs.build.outputs.new_version }}"
       #    echo "✅ Imagem completa: $CONTAINER"
   
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            REPO_NAME="${{ needs.build.outputs.repo_name }}"
-            VERSION="${{ needs.build.outputs.new_version }}"
-            IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:$VERSION"
+      # - name: Deploy to EC2 via SSH
+      #   uses: appleboy/ssh-action@v0.1.5
+      #   with:
+      #     host: ${{ secrets.EC2_HOST }}
+      #     username: ${{ secrets.EC2_USER }}
+      #     key: ${{ secrets.EC2_PRIVATE_KEY }}
+      #     script: |
+      #       REPO_NAME="${{ needs.build.outputs.repo_name }}"
+      #       VERSION="${{ needs.build.outputs.new_version }}"
+      #       IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:$VERSION"
 
-            echo "🔄 Iniciando deploy da imagem: $IMAGE"
+      #       echo "🔄 Iniciando deploy da imagem: $IMAGE"
 
-            # Garantir que o Docker esteja disponível
-            sudo yum update -y || sudo apt update -y
-            sudo systemctl start docker || sudo service docker start
+      #       # Garantir que o Docker esteja disponível
+      #       sudo yum update -y || sudo apt update -y
+      #       sudo systemctl start docker || sudo service docker start
 
-            # Verificar container existente
-            CONTAINER_ID=$(docker ps -q --filter "name=$REPO_NAME")
-            # Remover qualquer container (rodando ou parado) com o nome
-            if docker ps -a --format '{{.Names}}' | grep -Eq "^$REPO_NAME$"; then
-              echo "🛑 Removendo container existente (rodando ou parado)..."
-              docker rm -f $REPO_NAME || true
-            else
-              echo "ℹ️ Nenhum container (rodando ou parado) encontrado com nome: $REPO_NAME"
-            fi
+      #       # Verificar container existente
+      #       CONTAINER_ID=$(docker ps -q --filter "name=$REPO_NAME")
+      #       # Remover qualquer container (rodando ou parado) com o nome
+      #       if docker ps -a --format '{{.Names}}' | grep -Eq "^$REPO_NAME$"; then
+      #         echo "🛑 Removendo container existente (rodando ou parado)..."
+      #         docker rm -f $REPO_NAME || true
+      #       else
+      #         echo "ℹ️ Nenhum container (rodando ou parado) encontrado com nome: $REPO_NAME"
+      #       fi
 
-            echo "🧹 Removendo imagem local antiga, se existir..."
-            docker rmi -f "$IMAGE" || echo "ℹ️ Nenhuma imagem antiga encontrada com a tag: $IMAGE"
+      #       echo "🧹 Removendo imagem local antiga, se existir..."
+      #       docker rmi -f "$IMAGE" || echo "ℹ️ Nenhuma imagem antiga encontrada com a tag: $IMAGE"
 
-            echo "⬇️ Baixando nova imagem..."
-            docker pull $IMAGE
+      #       echo "⬇️ Baixando nova imagem..."
+      #       docker pull $IMAGE
 
-            echo "🚀 Subindo novo container... $REPO_NAME $IMAGE"
-            docker run -d \
-            --name $REPO_NAME \
-            -p 80:80 \
-            -p 443:443 \
-            -v /home/ec2-user/nginx.conf:/etc/nginx/nginx.conf:ro \
-            -v /etc/letsencrypt/live/projeto-compras-dsm.duckdns.org/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro \
-            -v /etc/letsencrypt/live/projeto-compras-dsm.duckdns.org/privkey.pem:/etc/nginx/certs/privkey.pem:ro \
-            $IMAGE
+      #       echo "🚀 Subindo novo container... $REPO_NAME $IMAGE"
+      #       docker run -d \
+      #       --name $REPO_NAME \
+      #       -p 80:80 \
+      #       -p 443:443 \
+      #       -v /home/ec2-user/nginx.conf:/etc/nginx/nginx.conf:ro \
+      #       -v /etc/letsencrypt/live/projeto-compras-dsm.duckdns.org/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro \
+      #       -v /etc/letsencrypt/live/projeto-compras-dsm.duckdns.org/privkey.pem:/etc/nginx/certs/privkey.pem:ro \
+      #       $IMAGE
