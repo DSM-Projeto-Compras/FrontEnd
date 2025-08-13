@@ -26,9 +26,9 @@ COPY . .
 # COPY nginx.conf /etc/nginx/nginx.conf
 
 # Criando algumas variáveis de ambiente
-ENV MONGODB_INITDB_ROOT_USERNAME=user
-ENV MONGODB_INITDB_ROOT_PASSWORD=pass
-ENV MONGODB_INITDB_DATABASE=projetocompras
+# ENV MONGODB_INITDB_ROOT_USERNAME=user
+# ENV MONGODB_INITDB_ROOT_PASSWORD=pass
+# ENV MONGODB_INITDB_DATABASE=projetocompras
 
 # Porta exposta em que a aplicação roda
 EXPOSE 3000
