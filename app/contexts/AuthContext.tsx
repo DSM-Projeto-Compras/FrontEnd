@@ -6,6 +6,7 @@ import AuthService from "../services/authService";
 
 interface AuthContextProps {
   isAuthenticated: boolean;
+  loading?: boolean;
   user: any;
   login: (email: string, password: string, remember: boolean) => Promise<void>;
   logout: () => void;
@@ -20,12 +21,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (token) {
       setIsAuthenticated(true);
       setUser({ token });
     }
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string, remember: boolean) => {
@@ -61,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
