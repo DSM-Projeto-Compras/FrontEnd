@@ -1,8 +1,7 @@
-import { env } from "@/config/env";
 import axios from "axios";
 
 // const apiUrl = "https://projeto-mvc-restful-server.vercel.app/api/logins";
-const apiUrl = env.apiBaseUrl + "/logins";
+const apiUrl = process.env.NEXT_PUBLIC_API_BASEURL + "/logins";
 
 interface LoginCredentials {
   email: string;
