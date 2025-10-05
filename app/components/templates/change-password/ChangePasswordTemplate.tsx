@@ -1,9 +1,9 @@
-import Header from "../../organisms/Header";
+import Header from "../../molecules/HeaderLogin";
 
 const ChangePasswordTemplate: React.FC = () => {
     return (
         <div>
-            <Header admin={true} />
+            <Header />
         </div>
     )
 }
