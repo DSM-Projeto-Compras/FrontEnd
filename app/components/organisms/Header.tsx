@@ -46,26 +46,6 @@ const Header: React.FC<HeaderProps> = ({ admin = true }) => {
                 </li>
               </>
             )}
-            {admin && (
-              <>
-              <li>
-                <a
-                  onClick={() => navigateTo("admin-dashboard")}
-                  className="cursor-pointer"
-                >
-                  Histórico
-                </a>
-              </li> 
-              <li>
-                <a
-                  onClick={() => navigateTo("admin-users")}
-                  className="cursor-pointer"
-                >
-                  Administradores  
-                </a>  
-              </li>             
-              </>
-            )}
             <li>
               <button
                 type="button"

@@ -6,16 +6,14 @@ import HistoricTemplate from "../../components/templates/historic/HistoricTempla
 import { useAuth } from "../../contexts/AuthContext";
 
 const HistoricPage: React.FC = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    if (!isAuthenticated) {
       router.push("login");
     }
-  }, [isAuthenticated, loading, router]);
-
-  if (loading) return null;
+  }, [isAuthenticated, router]);
 
   return isAuthenticated ? <HistoricTemplate /> : null;
 };

@@ -6,16 +6,14 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 const AdminDashboardPage: React.FC = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    if (!isAuthenticated) {
       router.push("login");
     }
-  }, [isAuthenticated, loading, router]);
-
-  if (loading) return null;
+  }, [isAuthenticated, router]);
 
   return isAuthenticated ? <AdminDashboardTemplate /> : null;
 };
