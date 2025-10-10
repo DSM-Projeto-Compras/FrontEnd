@@ -13,10 +13,6 @@ const ChangePasswordAdminTemplate: React.FC = () => {
                             <div className="w-full max-w-md">
                                 <form className="space-y-4 md:space-y-6">
                                     <div>
-                                        <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">Senha atual</label>
-                                        <input type="password" name="currentPassword" id="currentPassword" data-testid="currentPassword" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-                                    </div>
-                                    <div>
                                         <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">Nova senha</label>
                                         <input type="password" name="newPassword" id="newPassword" data-testid="newPassword" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                     </div>

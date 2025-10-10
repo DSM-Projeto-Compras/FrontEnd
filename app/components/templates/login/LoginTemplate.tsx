@@ -98,7 +98,11 @@ const LoginTemplate: React.FC<{
                       )}
                     </div>
 
-                    <div className="flex items-center">
+                    <div>
+                      <p className="text-sm text-gray-600">Esqueceu a senha? <a href="change-password" className="font-medium text-blue-600 hover:text-blue-500">Clique aqui</a></p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center">
                       <input
                         type="checkbox"
                         name="remember"
@@ -115,6 +119,9 @@ const LoginTemplate: React.FC<{
                       >
                         Lembrar login
                       </label>
+
+                      
+                      
                     </div>
                     <button
                       type="submit"
