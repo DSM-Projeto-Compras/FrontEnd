@@ -1,5 +1,5 @@
 # Imagem node
-FROM node:20 as build
+FROM node:20 AS build
 
 # Diretório dos arquivos no container
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN npm install --force
 COPY . .
 
 # Compila a aplicação para produção
- RUN npm run build
+RUN npm run build
 
 # Usa a imagem oficial do Nginx (para aws)
 # FROM nginx:stable-alpine
