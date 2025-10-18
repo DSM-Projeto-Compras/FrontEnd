@@ -68,9 +68,9 @@ const AdminUsersTemplate: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {admins.map((admin) => (
+                            {admins.map((admin, index) => (
 
-                            <tr key={admin._id}>
+                            <tr key={admin._id ?? index}>
                                 <td className="px-6 py-3">{admin.nome}</td>
                                 <td className="px-6 py-3">{admin.email}</td>
                                 <td className="px-6 py-3 gap-4 flex">
