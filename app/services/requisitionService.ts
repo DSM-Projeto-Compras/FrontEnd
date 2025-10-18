@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // const apiUrl = "https://projeto-mvc-restful-server.vercel.app/api/products";
-const apiUrl = process.env.NEXT_PUBLIC_API_BASEURL + "/products";
+const apiProductUrl = process.env.NEXT_PUBLIC_API_BASEURL + "/products";
+const apiUsersUrl = process.env.NEXT_PUBLIC_API_BASEURL + "/logins";
 
 interface RequisitionData {
   nome: string;
@@ -51,11 +52,18 @@ interface RequisitedDataAdmin {
   justificativa?: string;
 }
 
+interface RequisitedUserData {
+  _id: string;
+  nome: string;
+  email: string;
+  admin: boolean;
+}
+
 class RequisitionService {
   async sendRequisition(data: RequisitionData): Promise<void> {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.post(apiUrl, data, {
+      await axios.post(apiProductUrl, data, {
         headers: {
           "access-token": token || "",
         },
@@ -70,7 +78,7 @@ class RequisitionService {
   async getProducts(): Promise<RequisitedData[]> {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get(apiUrl, {
+      const response = await axios.get(apiProductUrl, {
         headers: {
           "access-token": token || "",
         },
@@ -86,7 +94,7 @@ class RequisitionService {
   async getAllProducts(): Promise<RequisitedDataAdmin[]> {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get(`${apiUrl}/all`, {
+      const response = await axios.get(`${apiProductUrl}/all`, {
         headers: {
           "access-token": token || "",
         },
@@ -101,7 +109,7 @@ class RequisitionService {
   async updateProduct(data: EditData): Promise<void> {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.put(`${apiUrl}/`, data, {
+      await axios.put(`${apiProductUrl}/`, data, {
         headers: {
           "access-token": token || "",
         },
@@ -116,7 +124,7 @@ class RequisitionService {
   async deleteProduct(id: string): Promise<void> {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.delete(`${apiUrl}/${id}`, {
+      await axios.delete(`${apiProductUrl}/${id}`, {
         headers: {
           "access-token": token || "",
         },
@@ -131,7 +139,7 @@ class RequisitionService {
   async updateProductStatus(data: EditDataStatus): Promise<void> {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.put(`${apiUrl}/aprove/${data._id}`, data, {
+      await axios.put(`${apiProductUrl}/aprove/${data._id}`, data, {
         headers: {
           "access-token": token || "",
         },
@@ -139,6 +147,23 @@ class RequisitionService {
       console.log("Requisição enviada com sucesso");
     } catch (error) {
       console.error("Erro ao enviar a requisição:", error);
+      throw error;
+    }
+  }
+
+
+  // Users
+  async getAdmins(): Promise<RequisitedUserData[]> {
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await axios.get(apiUsersUrl, {
+        headers: {
+          "access-token": token || "",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar administradores:", error);
       throw error;
     }
   }
