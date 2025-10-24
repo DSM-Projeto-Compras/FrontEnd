@@ -41,6 +41,23 @@ class AdminService {
       throw error;
     }
   }
+
+  async deleteUser(id: string) {
+    try {
+      const token = localStorage.getItem("access_token");
+      
+      const response = await axios.delete(`${apiUrl}/usuario/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao excluir usuário:", error);
+      throw error;
+    }
+  }
 }
 
 export default new AdminService();
