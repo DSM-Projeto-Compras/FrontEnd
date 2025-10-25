@@ -37,7 +37,7 @@ interface RequisitedData {
 }
 
 interface RequisitedDataAdmin {
-  _id: string;
+  id: string;
   nome: string;
   data: string;
   tipo: string;
@@ -45,8 +45,8 @@ interface RequisitedDataAdmin {
   categoria: string;
   status: string;
   descricao?: string;
-  userId: {
-    _id: string;
+  user: {
+    id: string;
     nome: string;
   };
   justificativa?: string;

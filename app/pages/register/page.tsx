@@ -22,6 +22,8 @@ const RegisterPage: React.FC = () => {
 
     try {
       await AuthService.register({ nome, email, senha });
+
+      alert("Cadastro realizado com sucesso!");
       router.push("/");
     } catch (error: any) {
       if (
