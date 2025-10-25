@@ -25,7 +25,7 @@ interface EditDataStatus {
 }
 
 interface RequisitedData {
-  _id: string;
+  id: string;
   nome: string;
   data: string;
   tipo: string;

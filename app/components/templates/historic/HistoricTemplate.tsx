@@ -25,6 +25,23 @@ const HistoricTemplate: React.FC = () => {
   ); // Estado para o menu de cada produto
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+  // Effect para fechar o menu quando clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Verifica se o clique não foi no botão dropdown nem em nenhum elemento dentro do menu
+      if (!target.closest('#dropdownButton') && !target.closest('.dropdown-menu')) {
+        setActiveProductMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const [filters, setFilters] = useState<FilterValues>({
     name: "",
     status: "",
@@ -126,6 +143,7 @@ const HistoricTemplate: React.FC = () => {
     setEditDescription(product.description);
     setEditQuantity(product.quantity);
     setIsEditModalOpen(true);
+    setActiveProductMenu(null);
   };
 
   const closeEditModal = () => {
@@ -191,7 +209,7 @@ const HistoricTemplate: React.FC = () => {
       try {
         const response = await RequisitonService.getProducts();
         const products: Product[] = response.map((item) => ({
-          id: item._id,
+          id: item.id,
           name: item.nome,
           description: item.descricao || "",
           quantity: item.quantidade,
@@ -405,7 +423,7 @@ const HistoricTemplate: React.FC = () => {
                     {activeProductMenu === product.id && (
                       <div
                         ref={menuRef}
-                        className="absolute z-10 w-40 bg-white rounded divide-y divide-gray-100 shadow top-10"
+                        className="dropdown-menu absolute z-10 w-40 bg-white rounded divide-y divide-gray-100 shadow top-10"
                       >
                         <ul className="py-1 text-sm text-gray-700">
                           {/* Condicional para as opções de acordo com o status */}
