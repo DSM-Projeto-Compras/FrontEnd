@@ -34,6 +34,41 @@ class AuthService {
       throw error;
     }
   }
+
+  async forgotPassword(email: string) {
+    try {
+      const response = await axios.post(`${apiUrl}/forgot`, {email});
+
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao enviar email de recuperação:", error);
+      throw error;
+    }
+  }
+
+  async verifyCode(email: string, codigo: string) {
+  try {
+    const response = await axios.post(`${apiUrl}/verify`, { email, codigo });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao verificar código:", error);
+    throw error;
+  }
+  }
+
+  async resetPassword(email: string, codigo: string, novaSenha: string) {
+    try {
+      const response = await axios.patch(`${apiUrl}/reset`, {
+        email,
+        codigo,
+        novaSenha,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao redefinir senha:", error);
+      throw error;
+    }
+  }
 }
 
 export default new AuthService();
