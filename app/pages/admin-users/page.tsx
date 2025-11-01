@@ -24,8 +24,8 @@ const AdminUsersPage: React.FC = () => {
       alert("Administrador removido com sucesso!");
       window.location.reload();
     } catch (error) {
-      console.error("Erro ao excluir administrador:", error);
-      alert("Erro ao excluir administrador!");
+      console.log("Erro ao excluir administrador:", error);
+      alert("Não é permitido excluir administradores mais antigos.");
     }
   };
 

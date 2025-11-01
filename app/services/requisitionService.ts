@@ -10,6 +10,12 @@ interface RequisitionData {
   quantidade: number;
   categoria: string;
   descricao?: string;
+  cod_id?: string;
+  grupo?: string;
+  classe?: string;
+  material?: string;
+  elemento?: string;
+  natureza?: string;
 }
 
 interface EditData {
@@ -34,6 +40,12 @@ interface RequisitedData {
   status: string;
   descricao?: string;
   justificativa?: string;
+  cod_id?: string;
+  grupo?: string;
+  classe?: string;
+  material?: string;
+  elemento?: string;
+  natureza?: string;
 }
 
 interface RequisitedDataAdmin {
@@ -50,6 +62,12 @@ interface RequisitedDataAdmin {
     nome: string;
   };
   justificativa?: string;
+  cod_id?: string;
+  grupo?: string;
+  classe?: string;
+  material?: string;
+  elemento?: string;
+  natureza?: string;
 }
 
 interface RequisitedUserData {

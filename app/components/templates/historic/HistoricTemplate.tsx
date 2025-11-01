@@ -13,6 +13,12 @@ interface Product {
   category: string;
   type: string;
   justification?: string;
+  cod_id?: string;
+  grupo?: string;
+  classe?: string;
+  material?: string;
+  elemento?: string;
+  natureza?: string;
 }
 
 const HistoricTemplate: React.FC = () => {
@@ -218,6 +224,12 @@ const HistoricTemplate: React.FC = () => {
           category: item.categoria,
           type: item.tipo,
           justification: item.justificativa,
+          cod_id: item.cod_id,
+          grupo: item.grupo,
+          classe: item.classe,
+          material: item.material,
+          elemento: item.elemento,
+          natureza: item.natureza,
         }));
 
         setAllProducts(products);
@@ -620,6 +632,48 @@ const HistoricTemplate: React.FC = () => {
                     <strong>Tipo:</strong> {viewingProduct?.type}
                   </p>
                 </div>
+                {viewingProduct?.cod_id && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700">
+                      <strong>Código ID:</strong> {viewingProduct?.cod_id}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.grupo && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Grupo:</strong> {viewingProduct?.grupo}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.classe && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Classe:</strong> {viewingProduct?.classe}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.material && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Material:</strong> {viewingProduct?.material}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.elemento && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Elemento:</strong> {viewingProduct?.elemento}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.natureza && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Natureza:</strong> {viewingProduct?.natureza}
+                    </p>
+                  </div>
+                )}
               </>
             ) : (
               <div className="mb-4">

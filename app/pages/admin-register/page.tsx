@@ -44,7 +44,7 @@ const AdminRegisterPage: React.FC = () => {
         role: "admin",
       });
       alert("Administrador criado com sucesso!");
-      router.push("/admin/dashboard");
+      router.push("/");
     } catch (error: any) {
       if (
         error.response &&

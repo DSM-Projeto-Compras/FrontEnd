@@ -17,7 +17,7 @@ const ChangePasswordPage: React.FC = () => {
       setMensagem(res.message);
       setStep(2);
     } catch (error: any) {
-      setErro(error.response?.data?.message || "Erro ao enviar email");
+      setErro(error.response?.data?.message || "");
     }
   };
 
