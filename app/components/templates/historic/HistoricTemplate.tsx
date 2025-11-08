@@ -13,6 +13,12 @@ interface Product {
   category: string;
   type: string;
   justification?: string;
+  cod_id?: string;
+  grupo?: string;
+  classe?: string;
+  material?: string;
+  elemento?: string;
+  natureza?: string;
 }
 
 const HistoricTemplate: React.FC = () => {
@@ -25,6 +31,23 @@ const HistoricTemplate: React.FC = () => {
   ); // Estado para o menu de cada produto
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+  // Effect para fechar o menu quando clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Verifica se o clique não foi no botão dropdown nem em nenhum elemento dentro do menu
+      if (!target.closest('#dropdownButton') && !target.closest('.dropdown-menu')) {
+        setActiveProductMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const [filters, setFilters] = useState<FilterValues>({
     name: "",
     status: "",
@@ -126,6 +149,7 @@ const HistoricTemplate: React.FC = () => {
     setEditDescription(product.description);
     setEditQuantity(product.quantity);
     setIsEditModalOpen(true);
+    setActiveProductMenu(null);
   };
 
   const closeEditModal = () => {
@@ -191,7 +215,7 @@ const HistoricTemplate: React.FC = () => {
       try {
         const response = await RequisitonService.getProducts();
         const products: Product[] = response.map((item) => ({
-          id: item._id,
+          id: item.id,
           name: item.nome,
           description: item.descricao || "",
           quantity: item.quantidade,
@@ -200,6 +224,12 @@ const HistoricTemplate: React.FC = () => {
           category: item.categoria,
           type: item.tipo,
           justification: item.justificativa,
+          cod_id: item.cod_id,
+          grupo: item.grupo,
+          classe: item.classe,
+          material: item.material,
+          elemento: item.elemento,
+          natureza: item.natureza,
         }));
 
         setAllProducts(products);
@@ -405,7 +435,7 @@ const HistoricTemplate: React.FC = () => {
                     {activeProductMenu === product.id && (
                       <div
                         ref={menuRef}
-                        className="absolute z-10 w-40 bg-white rounded divide-y divide-gray-100 shadow top-10"
+                        className="dropdown-menu absolute z-10 w-40 bg-white rounded divide-y divide-gray-100 shadow top-10"
                       >
                         <ul className="py-1 text-sm text-gray-700">
                           {/* Condicional para as opções de acordo com o status */}
@@ -602,6 +632,48 @@ const HistoricTemplate: React.FC = () => {
                     <strong>Tipo:</strong> {viewingProduct?.type}
                   </p>
                 </div>
+                {viewingProduct?.cod_id && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700">
+                      <strong>Código ID:</strong> {viewingProduct?.cod_id}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.grupo && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Grupo:</strong> {viewingProduct?.grupo}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.classe && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Classe:</strong> {viewingProduct?.classe}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.material && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Material:</strong> {viewingProduct?.material}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.elemento && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Elemento:</strong> {viewingProduct?.elemento}
+                    </p>
+                  </div>
+                )}
+                {viewingProduct?.natureza && (
+                  <div className="mb-4">
+                    <p className="block text-sm font-medium text-gray-700 break-words">
+                      <strong>Natureza:</strong> {viewingProduct?.natureza}
+                    </p>
+                  </div>
+                )}
               </>
             ) : (
               <div className="mb-4">

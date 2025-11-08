@@ -27,6 +27,7 @@ const LoginTemplate: React.FC<{
       <Header />
       <section className="bg-white">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto pt-28 mb-14">
+          <h1 className="text-3xl m-8 font-light font-sans">Gerenciador de Pedidos de Compra</h1>
           <div className="w-full bg-white rounded-lg shadow-2xl md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
@@ -98,7 +99,11 @@ const LoginTemplate: React.FC<{
                       )}
                     </div>
 
-                    <div className="flex items-center">
+                    <div>
+                      <p className="text-sm text-gray-600">Esqueceu a senha? <a href="change-password" className="font-medium text-blue-600 hover:text-blue-500">Clique aqui</a></p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center">
                       <input
                         type="checkbox"
                         name="remember"
@@ -115,6 +120,9 @@ const LoginTemplate: React.FC<{
                       >
                         Lembrar login
                       </label>
+
+                      
+                      
                     </div>
                     <button
                       type="submit"

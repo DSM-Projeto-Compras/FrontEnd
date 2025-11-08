@@ -1,10 +1,8 @@
 "use client"; // Garantir que este código seja executado no lado do cliente
 
-import type { Metadata } from "next";
 import { useEffect } from "react";
 import Hotjar from "@hotjar/browser"; // Importar o Hotjar
 import "./globals.css";
-import localFont from "next/font/local";
 import { ReactNode } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { usePathname } from "next/navigation";
