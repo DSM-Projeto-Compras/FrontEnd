@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import HistoricTemplate from "../../components/templates/historic/HistoricTemplate";
 import { useAuth } from "../../contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import ChangePasswordAdminTemplate from "@/app/components/templates/change-password-admin/ChangePasswordAdminTemplate";
 
-const HistoricPage: React.FC = () => {
+const AdminPasswordPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
 
@@ -17,7 +17,7 @@ const HistoricPage: React.FC = () => {
 
   if (loading) return null;
 
-  return isAuthenticated ? <HistoricTemplate /> : null;
+  return isAuthenticated ? <ChangePasswordAdminTemplate /> : null;
 };
 
-export default HistoricPage;
+export default AdminPasswordPage;

@@ -18,6 +18,12 @@ interface RequisitionFormValues {
   quantidade: string;
   categoria: string;
   descricao: string;
+  cod_id?: string;
+  grupo?: string;
+  classe?: string;
+  material?: string;
+  elemento?: string;
+  natureza?: string;
 }
 
 const RequisitionTemplate: React.FC = () => {
@@ -26,9 +32,12 @@ const RequisitionTemplate: React.FC = () => {
     null
   );
   const [productDetails, setProductDetails] = useState<{
+    cod_id: string;
+    grupo: string;
+    classe: string;
     material: string;
-    elementoDespesa: string;
-    naturezaDespesa: string;
+    elemento: string;
+    natureza: string;
   } | null>(null);
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -108,24 +117,30 @@ const RequisitionTemplate: React.FC = () => {
 
         const parser2 = new DOMParser();
         const doc2 = parser2.parseFromString(html2, "text/html");
-        const elementoDespesa = doc2.getElementById(
-          "ContentPlaceHolder1_lbNElementoDespesaInfo"
-        );
-        const material = doc2.getElementById(
-          "ContentPlaceHolder1_lbMaterialInfo"
-        );
-        const naturezaDespesa = doc2.getElementById(
-          "ContentPlaceHolder1_lbNdInfo"
-        );
+        
+        const grupo = doc2.getElementById("ContentPlaceHolder1_lbGrupoInfo");
+        const classe = doc2.getElementById("ContentPlaceHolder1_lbClasseInfo");
+        const material = doc2.getElementById("ContentPlaceHolder1_lbMaterialInfo");
+        const elemento = doc2.getElementById("ContentPlaceHolder1_lbNElementoDespesaInfo");
+        const natureza = doc2.getElementById("ContentPlaceHolder1_lbNdInfo");
 
-        if (elementoDespesa && material && naturezaDespesa) {
+        if (grupo && classe && material && elemento && natureza) {
           const newProductDetails = {
-            material: material.innerHTML,
-            elementoDespesa: elementoDespesa.innerHTML,
-            naturezaDespesa: naturezaDespesa.innerHTML,
+            cod_id: descricaoInput2,
+            grupo: grupo.innerHTML.trim(),
+            classe: classe.innerHTML.trim(),
+            material: material.innerHTML.trim(),
+            elemento: elemento.innerHTML.trim(),
+            natureza: natureza.innerHTML.trim().replace(/\r?\n/g, ' '),
           };
           setProductDetails(newProductDetails);
-          setFieldValue("tipo", newProductDetails.elementoDespesa);
+          setFieldValue("tipo", newProductDetails.elemento);
+          setFieldValue("cod_id", newProductDetails.cod_id);
+          setFieldValue("grupo", newProductDetails.grupo);
+          setFieldValue("classe", newProductDetails.classe);
+          setFieldValue("material", newProductDetails.material);
+          setFieldValue("elemento", newProductDetails.elemento);
+          setFieldValue("natureza", newProductDetails.natureza);
           setIsSuggestionSelected(true);
         }
       }
@@ -183,11 +198,12 @@ const RequisitionTemplate: React.FC = () => {
                   className="flex flex-col w-full leading-6 p-4 mb-2 border-blue-200 border bg-blue-100 rounded-xl text-sm"
                 >
                   <p className="font-semibold">Informações do produto</p>
-                  <p id="p1">{productDetails.material}</p>
-                  <p id="p2">{productDetails.elementoDespesa}</p>
-                  <p id="p3">
-                    {productDetails.naturezaDespesa.split("<br>")[0]}
-                  </p>{" "}
+                  <p id="p1"><strong>Código ID:</strong> {productDetails.cod_id}</p>
+                  <p id="p2"><strong>Grupo:</strong> {productDetails.grupo}</p>
+                  <p id="p3"><strong>Classe:</strong> {productDetails.classe}</p>
+                  <p id="p4"><strong>Material:</strong> {productDetails.material}</p>
+                  <p id="p5"><strong>Elemento:</strong> {productDetails.elemento}</p>
+                  <p id="p6"><strong>Natureza:</strong> {productDetails.natureza.split("<br>")[0]}</p>
                 </div>
               )}
 

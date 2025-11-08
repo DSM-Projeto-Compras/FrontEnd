@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛒 Projeto Compras FATEC - Frontend
 
-## Getting Started
+![npm](https://img.shields.io/badge/npm-v11.3.0-red?logo=npm)
+![Jest](https://img.shields.io/badge/jest-v29.7.0-green?logo=jest)
+![react](https://img.shields.io/badge/react-v18.2.0-blue?logo=react)
+![NextJS](https://img.shields.io/badge/nextjs-v15.0.1-white?logo=nextdotjs)
+![docker](https://img.shields.io/badge/docker-v28.3.0-blue?logo=docker)
 
-First, run the development server:
+
+Aplicação desenvolvida em colaboração com a FATEC Votorantim para auxiliar no manejo dos pedidos de compras realizados pelos funcionários para a Diretoria de Serviços Administrativos.
+
+Projeto desenvolvido com [Next.js](https://nextjs.org) e lançado através do [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## 🛠️ Ferramentas utilizadas
+
+- **Visualização de dados em mapa de calor:** HotJar 1.0
+- **Cliente HTTP:** Axios 1.7
+- **Criação de formulários:** Formik 2.4
+- **Validação de formulários:** Yup 1.4
+- **Estilização:** TailwindCSS 3.4.14
+
+## ⚙️ Configuração
+### Instalar dependências
+```bash
+npm install
+```
+
+#### Iniciar instância local do Backend (opcional)
+**Requisito**: Ter o repositório baixado e configurado. Acesso pelo [GitHub](https://github.com/DSM-Projeto-Compras/BackEnd).
+
+### 🐋 Docker
+Este repositório também possui um container no Docker, para configura-lo, utilize:
+```bash
+docker-compose up --build
+```
+
+### Como inicializar a aplicação
+
+Iniciar através do comando:
 
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
+# ou
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📃 Documentação Next.js
 
-## Learn More
+Para saber mais sobre o Next.js, você pode acessar a documentação através dos links:
 
-To learn more about Next.js, take a look at the following resources:
+- [Documentação Next.js](https://nextjs.org/docs) - recursos e API do Next.js.
+- [Tutorial Next.js](https://nextjs.org/learn) - tutorial de implementação e uso do Next.js.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Deploy no Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Esse projeto tem uma interface ativa provisória que pode ser acessada pelo [Vercel](front-end-five-kappa.vercel.app), impulsionado e facilitado pelo Next.js.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A documentação para esse processo se encontra em [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
