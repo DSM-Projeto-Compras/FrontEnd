@@ -7,7 +7,7 @@ const Home = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("pages/login");
+    router.push("/pages/login");
   }, [router]);
 
   return null;
