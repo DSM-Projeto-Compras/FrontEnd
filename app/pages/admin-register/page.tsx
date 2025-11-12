@@ -14,7 +14,7 @@ const AdminRegisterPage: React.FC = () => {
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push("/login");
+      router.push("/");
     }
   }, [isAuthenticated, loading, router]);
 
@@ -44,7 +44,7 @@ const AdminRegisterPage: React.FC = () => {
         role: "admin",
       });
       alert("Administrador criado com sucesso!");
-      router.push("/");
+      router.push("admin-users");
     } catch (error: any) {
       if (
         error.response &&

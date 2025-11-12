@@ -7,12 +7,12 @@ import React, { useEffect } from "react";
 import AdminService from "@/app/services/adminService";
 
 const AdminUsersPage: React.FC = () => {
-    const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push("login");
+      router.push("/");
     }
   }, [isAuthenticated, loading, router]);
 
@@ -34,6 +34,6 @@ const AdminUsersPage: React.FC = () => {
   return isAuthenticated ? (
     <AdminUsersTemplate onDelete={handleDelete} />
   ) : null;
-}
+};
 
 export default AdminUsersPage;

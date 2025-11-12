@@ -70,6 +70,24 @@ class AuthService {
       throw error;
     }
   }
+
+  async getMe() {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) throw new Error("Token não encontrado");
+
+      const response = await axios.get(`${apiUrl}/me`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao obter dados do usuário:", error);
+      throw error;
+    }
+  }
 }
 
 export default new AuthService();
