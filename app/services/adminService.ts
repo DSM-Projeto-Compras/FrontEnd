@@ -58,6 +58,27 @@ class AdminService {
       throw error;
     }
   }
+
+  async changePassword(senhaAtual: string, novaSenha: string, confirmaNovaSenha: string) {
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const response = await axios.patch(
+        `${apiUrl}/change`,
+        { senhaAtual, novaSenha, confirmaNovaSenha },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao mudar senha:", error);
+      throw error;
+    }
+  }
 }
 
 export default new AdminService();

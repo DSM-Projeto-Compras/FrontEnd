@@ -26,10 +26,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (token) {
-      setIsAuthenticated(true);
-      setUser({ token });
+      (async () => {
+        try {
+          const userData = await AuthService.getMe();
+          setUser(userData);
+          setIsAuthenticated(true);
+        } catch (err) {
+          console.error("Erro ao buscar usuário logado:", err);
+          localStorage.removeItem("access_token");
+          setIsAuthenticated(false);
+        } finally {
+          setLoading(false);
+        }
+      })();
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string, remember: boolean) => {
@@ -45,7 +57,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       setIsAuthenticated(true);
-      setUser({ email, cargo: response.cargo });
+
+      try {
+        const fullUser = await AuthService.getMe();
+        setUser(fullUser);
+      } catch {
+        setUser({ email, cargo: response.cargo });
+      }
 
       if (response.cargo === "admin") {
         router.push("admin-dashboard");
