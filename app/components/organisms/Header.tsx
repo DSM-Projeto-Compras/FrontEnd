@@ -55,7 +55,15 @@ const Header: React.FC<HeaderProps> = ({ admin = true }) => {
                 >
                   Histórico
                 </a>
-              </li> 
+              </li>
+              <li>
+                <a
+                  onClick={() => navigateTo("admin-suppliers")}
+                  className="cursor-pointer"
+                >
+                  Fornecedores
+                </a>
+              </li>
               <li>
                 <a
                   onClick={() => navigateTo("admin-users")}
