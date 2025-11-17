@@ -378,8 +378,9 @@ const HistoricTemplate: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {currentProducts.map((product) => (
-                <tr key={product.id} className="bg-white border-b">
+              {currentProducts.map((product, index) => (
+
+                <tr key={product.id ?? index} className="bg-white border-b">
                   <td className="px-6 py-4">
                     {isTextTooLong(product.name) ? (
                       <span className="flex font-medium">

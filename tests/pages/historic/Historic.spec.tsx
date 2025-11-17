@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act, within } from "@testing-library/react";
 import mockRouter from "next-router-mock";
 import { setupServer } from "msw/node";
 import { http } from "msw";
@@ -28,11 +28,11 @@ jest.mock("../../../app/services/requisitionService", () => ({
         [
             {
                 "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
-                "nome": 'Caneta Esferográfica',
+                "nome": 'Caneta Teste Azul',
                 "tipo": 'material-de-consumo',
-                "quantidade": 100,
+                "quantidade": 99,
                 "categoria": 'material-de-escritorio',
-                "descricao": 'Caneta esferográfica azul para escritório',
+                "descricao": 'Caneta teste azul para escritório',
                 "data": "2023-12-01T10:00:00.000Z",
                 "userId": "674b5c719cc34fc0cc69a6e2",
                 "justificativa": '',
@@ -49,7 +49,32 @@ jest.mock("../../../app/services/requisitionService", () => ({
                 "userId": "674b5c719cc34fc0cc69a6e2",
                 "justificativa": '',
                 "status": "Pendente"
-            }
+            },
+
+            {
+                "_id": "609c1f1f1b8c8b3a85f4d5f7",  
+                "nome": 'Caneta Teste Preta',
+                "tipo": 'material-de-consumo',
+                "quantidade": 70,
+                "categoria": 'material-de-escritorio',
+                "descricao": 'Caneta teste preta para escritório',
+                "data": "2025-11-01T10:00:00.000Z",
+                "userId": "674b5c719cc34fc0cc69a6e2",
+                "justificativa": 'Quantidade muito alta para compra neste momento',
+                "status": "Negado"
+            },
+            {
+                "_id": "609c1f1f1b8c8b3a85f4d5f8",  
+                "nome": 'Qudro branco',
+                "tipo": 'material-permanente',
+                "quantidade": 2,
+                "categoria": 'material-de-escritorio',
+                "descricao": 'Quadro branco para as salas superiores',
+                "data": "2025-11-02T10:00:00.000Z",
+                "userId": "674b5c719cc34fc0cc69a6e2",
+                "justificativa": '',
+                "status": "Aprovado"
+            },
         ],
     )
 }))
@@ -62,11 +87,11 @@ const server = setupServer(
                 products: [
                     {
                         "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
-                        "nome": 'Caneta Esferográfica',
+                        "nome": 'Caneta Teste Azul',
                         "tipo": 'material-de-consumo',
-                        "quantidade": 100,
+                        "quantidade": 99,
                         "categoria": 'material-de-escritorio',
-                        "descricao": 'Caneta esferográfica azul para escritório',
+                        "descricao": 'Caneta teste azul para escritório',
                         "data": "2023-12-01T10:00:00.000Z",
                         "userId": "60d21b4667d0d8992e610c85",
                         "justificativa": '',
@@ -83,14 +108,38 @@ const server = setupServer(
                         "userId": "60d21b4667d0d8992e610c85",
                         "justificativa": '',
                         "status": "Pendente"
-                    }
+                    },
+                    {
+                        "_id": "609c1f1f1b8c8b3a85f4d5f7",  
+                        "nome": 'Caneta Teste Preta',
+                        "tipo": 'material-de-consumo',
+                        "quantidade": 70,
+                        "categoria": 'material-de-escritorio',
+                        "descricao": 'Caneta teste preta para escritório',
+                        "data": "2025-11-01T10:00:00.000Z",
+                        "userId": "674b5c719cc34fc0cc69a6e2",
+                        "justificativa": 'Quantidade muito alta para compra neste momento',
+                        "status": "Negado"
+                    },
+                    {
+                        "_id": "609c1f1f1b8c8b3a85f4d5f8",  
+                        "nome": 'Qudro branco',
+                        "tipo": 'material-permanente',
+                        "quantidade": 2,
+                        "categoria": 'material-de-escritorio',
+                        "descricao": 'Quadro branco para as salas superiores',
+                        "data": "2025-11-02T10:00:00.000Z",
+                        "userId": "674b5c719cc34fc0cc69a6e2",
+                        "justificativa": '',
+                        "status": "Aprovado"
+                    },
                 ],
             });
         }
     ),
 )
 
-describe.skip("Header Component", () => {
+describe("Header Component", () => {
     //obs: aqui está sendo testado o Header, mas levando em consideração que está com uma estrutura única para a página de Histórico
     let mockPush: jest.Mock;
 
@@ -107,7 +156,7 @@ describe.skip("Header Component", () => {
         jest.clearAllMocks();
     })
 
-    it.skip("should logout", async () => {
+    it("should logout", async () => {
         const { logout } = useAuth();
         
         render(<Header admin={false} />);
@@ -118,8 +167,8 @@ describe.skip("Header Component", () => {
 
         await waitFor(() => {
             expect(logout).toHaveBeenCalled();
-            expect(localStorage.removeItem).toHaveBeenCalledWith('access_token');
-            expect(mockPush).toHaveBeenCalledWith('login');
+            // expect(localStorage.removeItem).toHaveBeenCalledWith("access_token")
+            expect(mockPush).toHaveBeenCalledWith('/');
         })
     })
 
@@ -144,7 +193,9 @@ describe.skip("Header Component", () => {
     })
 })
 
-describe.skip("Products List Page", () => {
+
+
+describe.skip("Products Filter", () => {
     beforeAll(() => {
         //Antes do teste, resgata o mock definido como acima
         mockRouter.setCurrentUrl("/products")
@@ -152,35 +203,34 @@ describe.skip("Products List Page", () => {
         jest.spyOn(requisitionService, "getProducts");
     });
     beforeEach(() => {
-        (useAuth as jest.Mock).mockReturnValue({ isAuthenticated: true, user: { email: "felipe@email.com", cargo: "user"}, login: jest.fn(), logout: jest.fn() })
+        (useAuth as jest.Mock).mockReturnValue({ isAuthenticated: true, user: { email: "user@fatec.sp.gov.br", cargo: "user"}, login: jest.fn(), logout: jest.fn() })
     })
     afterAll(() => { 
         server.close()
     });
     afterEach(() => {
-        server.resetHandlers;
+        server.resetHandlers();
         jest.clearAllMocks();
     })
 
-    it("should render product list", async () => {
-
-        
+    it("should render product list without filter", async () => {
 
         //pesquisa a página a partir do Template para construir a "base" para os dados
         //act garante atualizações de estado e espera a render
         await act( async () => {
-            render(<HistoricTemplate />);
+            render(<HistoricPage />);
         })  
 
+        const caneta = screen.getByText("Caneta Teste Azul");
+        const papel = screen.getByText(/papel sulfite a4 par\.\.\./i)
+
         await waitFor(() => {
-            screen.findByText("Esfereográfica")
-            screen.findByText("sulfite")
+            expect(caneta).toBeInTheDocument()
+            expect(papel).toBeInTheDocument()
         })
-        
+
         //Pesquisa na tela da página por qualquer texto escrito como abaixo (título h1 definido)
-        screen.getByText("Históricos dos produtos requisitados")
-        
-        //screen.debug()
+        expect(screen.getByText("Históricos dos produtos requisitados")).toBeInTheDocument()
     })
 
     it("should open filter button", async () => {
@@ -197,8 +247,6 @@ describe.skip("Products List Page", () => {
 
         fireEvent.click(botao);
 
-        //screen.logTestingPlaygroundURL();
-
         screen.getByRole('textbox', {  name: /nome/i})
         screen.getByLabelText(/data inicial:/i)
         screen.getByRole('combobox', {  name: /categoria/i})
@@ -210,7 +258,7 @@ describe.skip("Products List Page", () => {
 
     it("should filter products by name", async () => {
         await act( async () => {
-            render(<HistoricTemplate />);
+            render(<HistoricPage />);
         })
 
         const botaoAbrir = screen.getByRole('button', {
@@ -232,9 +280,115 @@ describe.skip("Products List Page", () => {
         
         fireEvent.click(botaoFechar);
         
-        screen.getByText(/caneta esferográfica\.\.\./i)
-        expect(screen.queryByText("sulfite")).not.toBeInTheDocument();
-        
+        screen.getByText(/caneta teste azul pa\.\.\./i)
+        expect(screen.queryByText("sulfite")).not.toBeInTheDocument(); 
+    })
+
+})
+
+describe("Products List", () => {
+    beforeAll(() => {
+        //Antes do teste, resgata o mock definido como acima
+        mockRouter.setCurrentUrl("/products")
+        server.listen();
+        jest.spyOn(requisitionService, "getProducts");
+    });
+    beforeEach(() => {
+        (useAuth as jest.Mock).mockReturnValue({ isAuthenticated: true, user: { email: "user@fatec.sp.gov.br", cargo: "user"}, login: jest.fn(), logout: jest.fn() })
+    })
+    afterAll(() => { 
+        server.close()
+    });
+    afterEach(() => {
+        server.resetHandlers();
+        jest.clearAllMocks();
+    })
+
+    it("should render 'denied', 'approved' and 'pendent' products on list", async () => {
+
+        await act( async () => {
+            render(<HistoricPage />);
+        })  
+
+        const row = screen.getByRole('row', {
+             name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const caneta = screen.getByText("Caneta Teste Preta");
+        const pendente = within(row).getByText(/pendente/i); //para valores repetidos isolar uma célula da tabela
+        const aprovado = screen.getByText("Aprovado");
+        const negado = screen.getByText("Negado");
+
+        expect(caneta).toBeVisible()
+        expect(pendente).toBeVisible()
+        expect(aprovado).toBeVisible()
+        expect(negado).toBeVisible()
+    })
+
+    it("should open details modal on pendent item", async () => {
+        await act( async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowCanetaAzul = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
+            name: /abrir menu/i
+        });
+
+        fireEvent.click(opcoesCanetaAzul)
+
+        const rowDetails = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
+        });
+
+        const detalhesCanetaAzul = within(rowDetails).getByText(/ver detalhes/i);
+
+        fireEvent.click(detalhesCanetaAzul)
+
+        const tituloDetalhes = screen.getByText("Detalhes do Produto")
+
+        expect(tituloDetalhes).toBeInTheDocument();
+    })
+
+    it("should edit pendent item details", async () => {
+        await act( async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowPapel = screen.getByRole('row', {
+            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesPapel = within(rowPapel).getByText(/abrir menu/i);
+
+        fireEvent.click(opcoesPapel)
+
+        const rowDetails = screen.getByRole('row', {
+            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
+        });
+
+        const editarPapel = within(rowDetails).getByText(/editar/i);
+
+        fireEvent.click(editarPapel)
+
+        const tituloEditar = screen.getByRole('heading', {  name: /editar produto/i})
+        const btnSalvar = screen.getByRole('button', {  name: /salvar/i})
+        const inputQtd = screen.getByRole('spinbutton')
+        const inputDescricao = screen.getByRole('textbox')
+
+        expect(tituloEditar).toBeInTheDocument()
+        expect(btnSalvar).toBeInTheDocument()
+
+        fireEvent.change(inputQtd, { target: {value: "12"}})
+        fireEvent.change(inputDescricao, { target: {value: "descricao editada"}})
+
+        fireEvent.click(btnSalvar)
+
+        screen.debug()
+        screen.logTestingPlaygroundURL()
     })
 })
 

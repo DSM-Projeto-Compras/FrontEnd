@@ -33,13 +33,23 @@ interface RegisterBody {
 // Handler de Registro
 const handleRegisterRequest = async ({ request }: { request: Request }) => {
     const body = await request.json() as RegisterBody;
-    const { nome } = body;
+    const { email } = body;
     
     // Simula erro de servidor
-    if(nome !== "Usuário teste") {
+    if(email === "erro@teste.com") {
         return Response.json({
-            message: "Erro no servidor (Nome não corresponde)",
-        },{status: 400});                
+            errors: [
+                { msg: "Apenas emails institucionais da Fatec (@fatec.sp.gov.br) são permitidos" },
+                { msg: "O nome deve ter no mínimo 3 caracteres"} //esta é uma resposta apenas para garantir a cobertura
+            ]
+        },{status: 400});
+    }
+
+    if(email === "errogenerico@fatec.sp.gov.br") {
+        return new Response(
+            null,
+            { status: 500, statusText: 'Internal Server Error' }
+        )
     }
 
     // Simula registro bem-sucedido
@@ -155,9 +165,66 @@ describe("Login Page Elements", () => {
         // await waitFor(() => expect(Router.push).toHaveAccessibleErrorMessage('As senhas não coincidem. Por favor, verifique.'), {timeout: 5000, interval: 100})
     })
 
-    // it("should throw a server error", () => {
+    it("should display specific API validation error message", async () => {
+        render(<RegisterPage />)
 
-    // })
+        const credentials = {
+            nome: "usr",
+            email: "erro@teste.com",
+            senha: "Senha@teste123",
+            confirmarSenha: "Senha@teste123"
+        }
+        //obs.: este email específico serve de 'gatilho' para o erro da api esperado
+
+        const nameField = screen.getByTestId("name");
+        const emailField = screen.getByTestId("email");
+        const passwordField = screen.getByTestId("password");
+        const confirmpwdField = screen.getByTestId("confirmPassword");
+        const btnRegister = screen.getByTestId("btnRegister");
+
+        fireEvent.change(nameField, {target: {value:credentials.nome} })
+        fireEvent.change(emailField, {target: {value:credentials.email}})
+        fireEvent.change(passwordField, {target: {value:credentials.senha}})
+        fireEvent.change(confirmpwdField, {target: {value:credentials.confirmarSenha}})
+
+        fireEvent.click(btnRegister);
+
+
+        const erroemail = await screen.findByText("Apenas emails institucionais da Fatec (@fatec.sp.gov.br) são permitidos");
+
+        expect(erroemail).toBeVisible()
+
+        expect(mockRouter.asPath).toEqual('/');
+    })
+
+    it("should display generic error message on server failure", async () => {
+        render(<RegisterPage />);
+        const credentials = {
+            nome: "Usuário Genérico",
+            email: "errogenerico@fatec.sp.gov.br",
+            senha: "Senha@teste123",
+            confirmarSenha: "Senha@teste123"
+        }
+
+        const nameField = screen.getByTestId("name");
+        const emailField = screen.getByTestId("email");
+        const passwordField = screen.getByTestId("password");
+        const confirmpwdField = screen.getByTestId("confirmPassword");
+        const btnRegister = screen.getByTestId("btnRegister");
+
+        fireEvent.change(nameField, {target: {value:credentials.nome}})
+        fireEvent.change(emailField, {target: {value:credentials.email}})
+        fireEvent.change(passwordField, {target: {value:credentials.senha}})
+        fireEvent.change(confirmpwdField, {target: {value:credentials.confirmarSenha}})
+
+        fireEvent.click(btnRegister);
+
+        const genericErrorMessage = await screen.findByText("Ocorreu um erro durante o cadastro. Por favor, tente novamente mais tarde.");
+        
+        expect(genericErrorMessage).toBeVisible();
+        
+        expect(mockRouter.asPath).toEqual('/'); 
+    })
 
 
 })

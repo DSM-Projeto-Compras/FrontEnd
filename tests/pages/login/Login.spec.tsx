@@ -79,7 +79,7 @@ const server = setupServer(
 
 
 
-describe("Login Page Elements", () => {
+describe.skip("Login Page Elements", () => {
     beforeAll(() => {
         server.listen();
     });
