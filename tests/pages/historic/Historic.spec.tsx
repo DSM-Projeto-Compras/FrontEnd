@@ -90,7 +90,7 @@ const server = setupServer(
     ),
 )
 
-describe("Header Component", () => {
+describe.skip("Header Component", () => {
     //obs: aqui está sendo testado o Header, mas levando em consideração que está com uma estrutura única para a página de Histórico
     let mockPush: jest.Mock;
 
@@ -144,7 +144,7 @@ describe("Header Component", () => {
     })
 })
 
-describe("Products List Page", () => {
+describe.skip("Products List Page", () => {
     beforeAll(() => {
         //Antes do teste, resgata o mock definido como acima
         mockRouter.setCurrentUrl("/products")

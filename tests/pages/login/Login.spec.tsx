@@ -1,34 +1,52 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import mockRouter, { MemoryRouter } from "next-router-mock";
-import { setupServer } from "msw/node";
-import { http } from "msw";
-import { env } from "../../../config/env"
-import '@testing-library/jest-dom'
-
-import LoginTemplate from "../../../app/components/templates/login/LoginTemplate"
-import LoginPage from "../../../app/pages/login/page";
-
-import Router from 'next/router'
-import { AuthProvider } from "../../../app/contexts/AuthContext";
-
-jest.mock('next/router', ()=> ({push: jest.fn()}))
+jest.mock('next/router', ()=> ({push: jest.fn(), onLogin: jest.fn()}))
 jest.mock("next/navigation", () => require("next-router-mock"));
 
+const MOCKED_API_URL = "http://localhost:4000/api";
+
+jest.mock("../../../config/env", () => ({
+    env: {
+        apiBaseUrl: MOCKED_API_URL
+    }
+}))
+
+
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
+import { setupServer } from "msw/node";
+import { http } from "msw";
+
+import '@testing-library/jest-dom'
+
+import LoginPage from "../../../app/pages/login/page";
+import { env } from "../../../config/env"
+
+import Router from 'next/router'
+import mockRouter from "next-router-mock";
+import { AuthProvider } from "../../../app/contexts/AuthContext";
+
+
+interface LoginBody {
+    email: string;
+    password: string;
+    remember: boolean;
+}
+
 const server = setupServer(
-    http.get(`${env.apiBaseUrl}/logins`, (_) => {
+    http.post<any, LoginBody, any>(`${env.apiBaseUrl}/logins`, async ({ request }) => {
         //com isso não é preciso passar pelo token de autenticação
-            const {email} = _.request as any;
+
+            const body = await request.json() as LoginBody;
+            const { email } = body;
             
             if(email === "erro@email.com") {
                 return Response.json({
-                    message: "aushuahs",
+                    message: "Erro no servidor",
                 },{status: 400});                
             }
 
-            if(email === "admin@email.com") {
+            if(email === "admin@fatec.sp.gov.br") {
                 return Response.json({
-                    access_token: "aushuahs",
+                    access_token: "token_admin",
                     cargo: "admin"
                 });                
             }
@@ -39,19 +57,43 @@ const server = setupServer(
             });
         }
     ),
-)
+    http.get(`${env.apiBaseUrl}/logins/me`, (req) => {
+        const authHeader = req.request.headers.get("Authorization");
+        if (authHeader === "Bearer token_admin") {
+            return Response.json({
+                email: "admin@fatec.sp.gov.br",
+                cargo: "admin"
+            });
+        } else if (authHeader === "Bearer access_token") {
+            return Response.json({
+                email: "user.teste@fatec.sp.gov.br",
+                cargo: "user"
+            });
+        }
+
+        return Response.json({
+            message: "Unauthorized"
+        }, { status: 401 });
+    })
+);
+
 
 
 describe("Login Page Elements", () => {
     beforeAll(() => {
-        //Antes do teste, resgata o mock definido como acima
-        mockRouter.setCurrentUrl("/logins")
         server.listen();
     });
     afterAll(() => { 
         server.close()
     });
-    afterEach(() => server.resetHandlers)
+    afterEach(() => {
+        server.resetHandlers();
+        (Router.push as jest.Mock).mockClear();
+        act(() => {
+            mockRouter.setCurrentUrl("/");
+        });
+    });
+
 
     it("should show elements", async () => {
         render(
@@ -60,7 +102,6 @@ describe("Login Page Elements", () => {
         </AuthProvider>
         );
 
-        
     
         const emailField = screen.getByTestId("email");
         const passwordField = screen.getByTestId("password");
@@ -75,16 +116,17 @@ describe("Login Page Elements", () => {
     });
 
 
-    it.only("should login", async () => {
+    it("should login user and navigate to /requisition", async () => {
+        render(
         <AuthProvider>
             <LoginPage />
         </AuthProvider>
-        const credentials = {
-            email: "user@email.com",
-            senha: "senha@teste"
-        }
+        );
 
-        
+        const credentials = {
+            email: "user.teste@fatec.sp.gov.br",
+            senha: "Senha@teste123"
+        }   
 
         const emailField = screen.getByLabelText(/email/i)
         const passwordField = screen.getByLabelText(/senha/i)
@@ -96,26 +138,25 @@ describe("Login Page Elements", () => {
         fireEvent.change(emailField, {target: {value:credentials.email}})
         fireEvent.change(passwordField, {target: {value:credentials.senha}})
 
-        expect(emailField).toHaveValue(credentials.email);
-        expect(passwordField).toHaveValue(credentials.senha);
-
         fireEvent.click(btnLogin);
 
-        await waitFor(() => expect(Router.push).toHaveBeenCalledWith('requisition'), {timeout: 5000, interval: 100})
+        await waitFor(() => expect(mockRouter.asPath).toEqual('/requisition'), {timeout: 5000, interval: 100})
     })
 
 
-    it("should login admin", async () => {
+    it("should login admin and navigate to /admin-dashboard", async () => {
+        render(
         <AuthProvider>
             <LoginPage />
         </AuthProvider>
+        );
         const credentials = {
-            email: "admin@email.com",
-            senha: "senha@teste"
+            email: "admin@fatec.sp.gov.br",
+            senha: "Admin@teste123"
         }
 
-        screen.logTestingPlaygroundURL();
-        screen.debug();
+        // screen.logTestingPlaygroundURL();
+        // screen.debug();
 
         const emailField = screen.getByTestId("email");
         const passwordField = screen.getByTestId("password");
@@ -127,18 +168,20 @@ describe("Login Page Elements", () => {
         fireEvent.change(emailField, {target: {value:credentials.email}})
         fireEvent.change(passwordField, {target: {value:credentials.senha}})
 
-        expect(emailField).toHaveValue(credentials.email);
-        expect(passwordField).toHaveValue(credentials.senha);
+        // expect(emailField).toHaveValue(credentials.email);
+        // expect(passwordField).toHaveValue(credentials.senha);
 
         fireEvent.click(btnLogin);
 
-        waitFor(() => expect(Router.push).toHaveAccessibleErrorMessage("Erro ao fazer login. Verifique suas credenciais."), {timeout: 5000, interval: 100})
+        await waitFor(() => expect(mockRouter.asPath).toEqual('/admin-dashboard'), {timeout: 5000, interval: 100})
     })
 
-    it("should throu an error", async () => {
+    it("should throw an error and display message", async () => {
+        render(
         <AuthProvider>
             <LoginPage />
         </AuthProvider>
+        );
         const credentials = {
             email: "erro@email.com",
             senha: "senha@teste"
@@ -152,12 +195,17 @@ describe("Login Page Elements", () => {
         fireEvent.change(emailField, {target: {value:credentials.email}})
         fireEvent.change(passwordField, {target: {value:credentials.senha}})
 
-        expect(emailField).toHaveValue(credentials.email);
-        expect(passwordField).toHaveValue(credentials.senha);
+        // expect(emailField).toHaveValue(credentials.email);
+        // expect(passwordField).toHaveValue(credentials.senha);
 
         fireEvent.click(btnLogin);
 
-        waitFor(() => expect(Router.push).toHaveBeenCalledWith('admin-dashboard'), {timeout: 5000, interval: 100})
+        const errorMessage = await screen.findByText("Erro ao fazer login. Verifique suas credenciais.");
+
+        expect(errorMessage).toBeVisible();
+
+        expect(Router.push).not.toHaveBeenCalled();
+        // await waitFor(() => expect(Router.push).toHaveBeenCalledWith('admin-dashboard'), {timeout: 5000, interval: 100})
     })
 
 

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import ChangePasswordUserTemplate from "@/app/components/templates/change-password-user/ChangePasswordUserTemplate";
-import AuthService from "@/app/services/authService";
+import ChangePasswordUserTemplate from "../../../app/components/templates/change-password-user/ChangePasswordUserTemplate";
+import AuthService from "../../../app/services/authService";
 
 const ChangePasswordPage: React.FC = () => {
   const [step, setStep] = React.useState(1);

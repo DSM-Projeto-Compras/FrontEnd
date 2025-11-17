@@ -1,6 +1,6 @@
 "use client"
 
-import { registerValidationSchema } from "@/app/validators/registerValidation";
+import { registerValidationSchema } from "../../../../app/validators/registerValidation";
 import Header from "../../organisms/Header"
 import { useFormik } from "formik";
 

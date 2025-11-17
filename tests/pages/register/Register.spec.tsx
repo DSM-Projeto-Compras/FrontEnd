@@ -1,4 +1,16 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+jest.mock('next/router', ()=> ({push: jest.fn()}))
+jest.mock("next/navigation", () => require("next-router-mock"));
+
+const MOCKED_API_URL = "http://localhost:4000/api";
+
+jest.mock("../../../config/env", () => ({
+    env: {
+        apiBaseUrl: MOCKED_API_URL
+    }
+}))
+
+
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import mockRouter, { MemoryRouter } from "next-router-mock";
 import { setupServer } from "msw/node";
@@ -6,27 +18,33 @@ import { http } from "msw";
 import { env } from "../../../config/env"
 import '@testing-library/jest-dom'
 
-import LoginTemplate from "../../../app/components/templates/register/RegisterTemplate"
 import RegisterPage from "../../../app/pages/register/page";
 
 import Router from 'next/router'
 
-jest.mock('next/router', ()=> ({push: jest.fn()}))
-jest.mock("next/navigation", () => require("next-router-mock"));
+
+interface RegisterBody {
+    nome: string;
+    email: string;
+    senha: string;
+    confirmarSenha: string;
+}
 
 const server = setupServer(
-    http.get(`${env.apiBaseUrl}/cadastro`, (_) => {
-            const {nome, email, senha} = _.request as any;
+    http.get<any, RegisterBody, any>(`${env.apiBaseUrl}/cadastro`, async ({ request }) => {
+
+            const body = await request.json() as RegisterBody;
+            const { nome, email, senha, confirmarSenha } = body;
             
             if(nome !== "userName" && nome !== "adminName") {
                 return Response.json({
-                    message: "aushuahs",
+                    message: "Erro no servidor",
                 },{status: 400});                
             }
 
-            if(email === "admin@email.com") {
+            if(email === "admin@fatec.sp.gov.br") {
                 return Response.json({
-                    access_token: "aushuahs",
+                    access_token: "token_admin",
                     cargo: "admin"
                 });                
             }
@@ -49,7 +67,7 @@ describe("Login Page Elements", () => {
     afterAll(() => { 
         server.close()
     });
-    afterEach(() => server.resetHandlers)
+    afterEach(() => server.resetHandlers())
 
     it("should show elements", async () => {
         render(<RegisterPage />);
@@ -72,10 +90,10 @@ describe("Login Page Elements", () => {
     it("should register", async () => {
         render(<RegisterPage />);
         const credentials = {
-            nome: "user",
-            email: "user@email.com",
-            senha: "senha@teste",
-            senhaErrada: "senhaaaa"
+            nome: "Usuário teste",
+            email: "user@fatec.sp.gov.br",
+            senha: "Senha@teste123",
+            confirmarSenha: "Senha@teste123"
         }
 
         const nameField = screen.getByTestId("name");
@@ -87,18 +105,15 @@ describe("Login Page Elements", () => {
         fireEvent.change(nameField, {target: {value:credentials.nome}})
         fireEvent.change(emailField, {target: {value:credentials.email}})
         fireEvent.change(passwordField, {target: {value:credentials.senha}})
-        fireEvent.change(confirmpwdField, {target: {value:credentials.senhaErrada}})
-
-        expect(emailField).toHaveValue(credentials.email);
-        expect(passwordField).toHaveValue(credentials.senha);
+        fireEvent.change(confirmpwdField, {target: {value:credentials.confirmarSenha}})
 
         fireEvent.click(btnRegister);
 
-        waitFor(() => expect(Router.push).toHaveBeenCalledWith(''), {timeout: 5000, interval: 100})
+        await waitFor(() => expect(Router.push).toHaveBeenCalledWith(''), {timeout: 5000, interval: 100})
     })
 
 
-    it("should throu an error", async () => {
+    it("should throw an error", async () => {
         render(<RegisterPage />);
         const credentials = {
             nome: "user",
@@ -121,7 +136,15 @@ describe("Login Page Elements", () => {
 
         fireEvent.click(btnRegister);
 
-        waitFor(() => expect(Router.push).toHaveAccessibleErrorMessage('As senhas não coincidem. Por favor, verifique.'), {timeout: 5000, interval: 100})
+        const errorMessage = await screen.findByText("As senhas não correspondem")
+
+        expect(errorMessage).toBeVisible();
+
+        expect(Router.push).not.toHaveBeenCalled();
+
+        // screen.debug();
+
+        // await waitFor(() => expect(Router.push).toHaveAccessibleErrorMessage('As senhas não coincidem. Por favor, verifique.'), {timeout: 5000, interval: 100})
     })
 
 
