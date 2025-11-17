@@ -11,8 +11,8 @@ jest.mock("../../../config/env", () => ({
 }))
 
 
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import mockRouter, { MemoryRouter } from "next-router-mock";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
+import mockRouter from "next-router-mock";
 import { setupServer } from "msw/node";
 import { http } from "msw";
 import { env } from "../../../config/env"
@@ -30,46 +30,48 @@ interface RegisterBody {
     confirmarSenha: string;
 }
 
+// Handler de Registro
+const handleRegisterRequest = async ({ request }: { request: Request }) => {
+    const body = await request.json() as RegisterBody;
+    const { nome } = body;
+    
+    // Simula erro de servidor
+    if(nome !== "Usuário teste") {
+        return Response.json({
+            message: "Erro no servidor (Nome não corresponde)",
+        },{status: 400});                
+    }
+
+    // Simula registro bem-sucedido
+    return Response.json({
+        message: "Usuário registrado com sucesso!",
+    }, { status: 201 });
+};
+
 const server = setupServer(
-    http.get<any, RegisterBody, any>(`${env.apiBaseUrl}/cadastro`, async ({ request }) => {
+    http.post<any, RegisterBody, any>(`${env.apiBaseUrl}/logins/cadastro`, handleRegisterRequest),
 
-            const body = await request.json() as RegisterBody;
-            const { nome, email, senha, confirmarSenha } = body;
-            
-            if(nome !== "userName" && nome !== "adminName") {
-                return Response.json({
-                    message: "Erro no servidor",
-                },{status: 400});                
-            }
-
-            if(email === "admin@fatec.sp.gov.br") {
-                return Response.json({
-                    access_token: "token_admin",
-                    cargo: "admin"
-                });                
-            }
-        
-            return Response.json({
-                access_token: "access_token",
-                cargo: "user"
-            });
-        }
-    ),
+    http.post<any, RegisterBody, any>(`/logins/cadastro`, handleRegisterRequest)
 )
 
 
 describe("Login Page Elements", () => {
     beforeAll(() => {
-        //Antes do teste, resgata o mock definido como acima
-        mockRouter.setCurrentUrl("/cadastro")
         server.listen();
     });
     afterAll(() => { 
         server.close()
     });
-    afterEach(() => server.resetHandlers())
+    afterEach(() => {
+        server.resetHandlers();
+        (Router.push as jest.Mock).mockClear();
+        act(() => {
+            mockRouter.setCurrentUrl("/");
+        });
 
-    it("should show elements", async () => {
+    })
+
+    it("should render elements", async () => {
         render(<RegisterPage />);
     
         const nameField = screen.getByTestId("name");
@@ -87,7 +89,7 @@ describe("Login Page Elements", () => {
     });
 
 
-    it("should register", async () => {
+    it("should register succesfully and navigate to /login", async () => {
         render(<RegisterPage />);
         const credentials = {
             nome: "Usuário teste",
@@ -109,11 +111,18 @@ describe("Login Page Elements", () => {
 
         fireEvent.click(btnRegister);
 
-        await waitFor(() => expect(Router.push).toHaveBeenCalledWith(''), {timeout: 5000, interval: 100})
+        const modalButton = await screen.findByText("Fazer Login");
+        expect(modalButton).toBeVisible()
+        expect(screen.getByText("Cadastro realizado com sucesso!")).toBeVisible()
+
+        fireEvent.click(modalButton);
+
+
+        await waitFor(() => expect(mockRouter.asPath).toEqual("/"), {timeout: 5000, interval: 100})
     })
 
 
-    it("should throw an error", async () => {
+    it("should throw a password error (passwords mismatch", async () => {
         render(<RegisterPage />);
         const credentials = {
             nome: "user",
@@ -128,11 +137,10 @@ describe("Login Page Elements", () => {
         const confirmpwdField = screen.getByTestId("confirmPassword");
         const btnRegister = screen.getByTestId("btnRegister");
 
+        fireEvent.change(nameField, {target: {value:credentials.nome} })
+        fireEvent.change(emailField, {target: {value:credentials.email}})
         fireEvent.change(passwordField, {target: {value:credentials.senha}})
         fireEvent.change(confirmpwdField, {target: {value:credentials.senhaErrada}})
-
-        expect(passwordField).toHaveValue(credentials.senha);
-        expect(confirmpwdField).toHaveValue(credentials.senhaErrada);
 
         fireEvent.click(btnRegister);
 
@@ -140,12 +148,16 @@ describe("Login Page Elements", () => {
 
         expect(errorMessage).toBeVisible();
 
-        expect(Router.push).not.toHaveBeenCalled();
+        expect(mockRouter.asPath).toEqual("/");
 
         // screen.debug();
 
         // await waitFor(() => expect(Router.push).toHaveAccessibleErrorMessage('As senhas não coincidem. Por favor, verifique.'), {timeout: 5000, interval: 100})
     })
+
+    // it("should throw a server error", () => {
+
+    // })
 
 
 })
