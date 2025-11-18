@@ -68,6 +68,7 @@ const RequisitionTemplate: React.FC = () => {
       setSuccessMessage("Produto solicitado com sucesso!");
     } catch (error) {
       setErrorMessage("Erro ao enviar a requisição.");
+      console.error("Erro na requisição:", error)
     }
   };
 

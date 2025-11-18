@@ -78,7 +78,8 @@ class AuthService {
 
       const response = await axios.get(`${apiUrl}/me`,{
           headers: {
-            Authorization: `Bearer ${token}`,
+            // Authorization: `Bearer ${token}`,
+            "access-token": token,
           },
         }
       );

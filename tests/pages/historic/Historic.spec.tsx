@@ -1,4 +1,105 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+const mockProducts = [
+    {
+        "id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
+        "nome": 'Caneta Teste Azul',
+        "tipo": 'material-de-consumo',
+        "quantidade": 99,
+        "categoria": 'material-de-escritorio',
+        "descricao": 'Caneta teste azul para escritório',
+        "data": "2023-12-01T10:00:00.000Z",
+        "userId": "674b5c719cc34fc0cc69a6e2",
+        "justificativa": '',
+        "status": "Pendente",
+    },
+    {
+        "id": "609c1f1f1b8c8b3a85f4d5f6",
+        "nome": 'Papel sulfite',
+        "tipo": 'material-de-consumo',
+        "quantidade": 50,
+        "categoria": 'material-de-escritorio',
+        "descricao": 'Papel sulfite A4 para material escolar',
+        "data": "2023-12-01T10:00:00.000Z",
+        "userId": "674b5c719cc34fc0cc69a6e2",
+        "justificativa": '',
+        "status": "Pendente"
+    },
+
+    {
+        "id": "609c1f1f1b8c8b3a85f4d5f7",  
+        "nome": 'Caneta Teste Preta',
+        "tipo": 'material-de-consumo',
+        "quantidade": 70,
+        "categoria": 'material-de-escritorio',
+        "descricao": 'Caneta teste preta para escritório',
+        "data": "2025-11-01T10:00:00.000Z",
+        "userId": "674b5c719cc34fc0cc69a6e2",
+        "justificativa": 'Quantidade muito alta para compra neste momento',
+        "status": "Negado"
+    },
+    {
+        "id": "609c1f1f1b8c8b3a85f4d5f8",  
+        "nome": 'Qudro branco',
+        "tipo": 'material-permanente',
+        "quantidade": 2,
+        "categoria": 'materiais-didaticos-pedagogicos',
+        "descricao": 'Quadro branco para as salas superiores',
+        "data": "2025-11-02T10:00:00.000Z",
+        "userId": "674b5c719cc34fc0cc69a6e2",
+        "justificativa": '',
+        "status": "Aprovado"
+    },
+
+    {
+        "id": "609c1f1f1b8c8b3a85f4d5f9",  
+        "nome": 'Quadro verde',
+        "tipo": 'material-permanente',
+        "quantidade": 2,
+        "categoria": 'materiais-didaticos-pedagogicos',
+        "descricao": 'Quadro verde para as salas superiores',
+        "data": "2025-11-02T10:00:00.000Z",
+        "userId": "674b5c719cc34fc0cc69a6e2",
+        "justificativa": '',
+        "status": "Pendente"
+    },
+    {
+        "id": "609c1f1f1b8c8b3a85f4d5f03",  
+        "nome": 'Quadro amarelo',
+        "tipo": 'material-permanente',
+        "quantidade": 2,
+        "categoria": 'materiais-didaticos-pedagogicos',
+        "descricao": 'Quadro amarelo para as salas superiores',
+        "data": "2025-11-02T10:00:00.000Z",
+        "userId": "674b5c719cc34fc0cc69a6e2",
+        "justificativa": '',
+        "status": "Pendente"
+    },
+    {
+        "id": "609c1f1f1b8c8b3a85f4d5f02",  
+        "nome": 'Quadro azul',
+        "tipo": 'material-permanente',
+        "quantidade": 2,
+        "categoria": 'materiais-didaticos-pedagogicos',
+        "descricao": 'Quadro azul para as salas superiores',
+        "data": "2025-11-02T10:00:00.000Z",
+        "userId": "674b5c719cc34fc0cc69a6e2",
+        "justificativa": '',
+        "status": "Pendente"
+    },
+    {
+        "id": "609c1f1f1b8c8b3a85f4d5f01",  
+        "nome": 'Quadro vermelho',
+        "tipo": 'material-permanente',
+        "quantidade": 2,
+        "categoria": 'materiais-didaticos-pedagogicos',
+        "descricao": 'Quadro vermelho para as salas superiores',
+        "data": "2025-11-02T10:00:00.000Z",
+        "userId": "674b5c719cc34fc0cc69a6e2",
+        "justificativa": '',
+        "status": "Pendente"
+    },
+]
+
 import { render, screen, waitFor, fireEvent, act, within } from "@testing-library/react";
 import mockRouter from "next-router-mock";
 import { setupServer } from "msw/node";
@@ -13,6 +114,8 @@ import requisitionService from "../../../app/services/requisitionService";
 import HistoricTemplate from "../../../app/components/templates/historic/HistoricTemplate";
 import { useAuth } from "../../../app/contexts/AuthContext";
 
+
+
 jest.mock('next/router', ()=> ({push: jest.fn()}))
 jest.mock("next/navigation", () => ({
     useRouter: jest.fn(),
@@ -23,60 +126,9 @@ jest.mock("../../../app/contexts/AuthContext", () => ({
 }));
 
 jest.mock("../../../app/services/requisitionService", () => ({
-    getProducts: jest.fn().mockResolvedValue(
-        //para ser captado pelo render, não deve estar em um objeto:
-        [
-            {
-                "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
-                "nome": 'Caneta Teste Azul',
-                "tipo": 'material-de-consumo',
-                "quantidade": 99,
-                "categoria": 'material-de-escritorio',
-                "descricao": 'Caneta teste azul para escritório',
-                "data": "2023-12-01T10:00:00.000Z",
-                "userId": "674b5c719cc34fc0cc69a6e2",
-                "justificativa": '',
-                "status": "Pendente",
-            },
-            {
-                "_id": "609c1f1f1b8c8b3a85f4d5f6",
-                "nome": 'Papel sulfite',
-                "tipo": 'material-de-consumo',
-                "quantidade": 50,
-                "categoria": 'material-de-escritorio',
-                "descricao": 'Papel sulfite A4 para material escolar',
-                "data": "2023-12-01T10:00:00.000Z",
-                "userId": "674b5c719cc34fc0cc69a6e2",
-                "justificativa": '',
-                "status": "Pendente"
-            },
-
-            {
-                "_id": "609c1f1f1b8c8b3a85f4d5f7",  
-                "nome": 'Caneta Teste Preta',
-                "tipo": 'material-de-consumo',
-                "quantidade": 70,
-                "categoria": 'material-de-escritorio',
-                "descricao": 'Caneta teste preta para escritório',
-                "data": "2025-11-01T10:00:00.000Z",
-                "userId": "674b5c719cc34fc0cc69a6e2",
-                "justificativa": 'Quantidade muito alta para compra neste momento',
-                "status": "Negado"
-            },
-            {
-                "_id": "609c1f1f1b8c8b3a85f4d5f8",  
-                "nome": 'Qudro branco',
-                "tipo": 'material-permanente',
-                "quantidade": 2,
-                "categoria": 'material-de-escritorio',
-                "descricao": 'Quadro branco para as salas superiores',
-                "data": "2025-11-02T10:00:00.000Z",
-                "userId": "674b5c719cc34fc0cc69a6e2",
-                "justificativa": '',
-                "status": "Aprovado"
-            },
-        ],
-    )
+    getProducts: jest.fn().mockResolvedValue(mockProducts),
+    updateProduct: jest.fn().mockResolvedValue({}),
+    deleteProduct: jest.fn().mockResolvedValue({}) 
 }))
 
 const server = setupServer(
@@ -84,56 +136,7 @@ const server = setupServer(
             return Response.json({
                 access_token: "access_token",
                 cargo: "user",
-                products: [
-                    {
-                        "_id": "609c1f1f1b8c8b3a85f4d5f5",  // ID fictício
-                        "nome": 'Caneta Teste Azul',
-                        "tipo": 'material-de-consumo',
-                        "quantidade": 99,
-                        "categoria": 'material-de-escritorio',
-                        "descricao": 'Caneta teste azul para escritório',
-                        "data": "2023-12-01T10:00:00.000Z",
-                        "userId": "60d21b4667d0d8992e610c85",
-                        "justificativa": '',
-                        "status": "Pendente",
-                    },
-                    {
-                        "_id": "609c1f1f1b8c8b3a85f4d5f6",
-                        "nome": 'Papel sulfite',
-                        "tipo": 'material-de-consumo',
-                        "quantidade": 50,
-                        "categoria": 'material-de-escritorio',
-                        "descricao": 'Papel sulfite A4 para material escolar',
-                        "data": "2023-12-01T10:00:00.000Z",
-                        "userId": "60d21b4667d0d8992e610c85",
-                        "justificativa": '',
-                        "status": "Pendente"
-                    },
-                    {
-                        "_id": "609c1f1f1b8c8b3a85f4d5f7",  
-                        "nome": 'Caneta Teste Preta',
-                        "tipo": 'material-de-consumo',
-                        "quantidade": 70,
-                        "categoria": 'material-de-escritorio',
-                        "descricao": 'Caneta teste preta para escritório',
-                        "data": "2025-11-01T10:00:00.000Z",
-                        "userId": "674b5c719cc34fc0cc69a6e2",
-                        "justificativa": 'Quantidade muito alta para compra neste momento',
-                        "status": "Negado"
-                    },
-                    {
-                        "_id": "609c1f1f1b8c8b3a85f4d5f8",  
-                        "nome": 'Qudro branco',
-                        "tipo": 'material-permanente',
-                        "quantidade": 2,
-                        "categoria": 'material-de-escritorio',
-                        "descricao": 'Quadro branco para as salas superiores',
-                        "data": "2025-11-02T10:00:00.000Z",
-                        "userId": "674b5c719cc34fc0cc69a6e2",
-                        "justificativa": '',
-                        "status": "Aprovado"
-                    },
-                ],
+                products: mockProducts
             });
         }
     ),
@@ -142,12 +145,18 @@ const server = setupServer(
 describe("Header Component", () => {
     //obs: aqui está sendo testado o Header, mas levando em consideração que está com uma estrutura única para a página de Histórico
     let mockPush: jest.Mock;
+    let mockLogout: jest.Mock;
 
     beforeEach(() => {
         mockPush = jest.fn();
+        mockLogout = jest.fn();
         (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
 
-        (useAuth as jest.Mock).mockReturnValue({ isAuthenticated: true, user: { email: "felipe@email.com", cargo: "user"}, login: jest.fn(), logout: jest.fn() })
+        (useAuth as jest.Mock).mockReturnValue({ 
+            isAuthenticated: true, 
+            user: { email: "felipe@email.com", cargo: "user"}, 
+            login: jest.fn(), 
+            logout: mockLogout })
 
         jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(jest.fn());
     });
@@ -157,16 +166,12 @@ describe("Header Component", () => {
     })
 
     it("should logout", async () => {
-        const { logout } = useAuth();
-        
         render(<Header admin={false} />);
         const botaoSair = screen.getByRole('button', { name: /sair/i });
         fireEvent.click(botaoSair);
         
-        
-
         await waitFor(() => {
-            expect(logout).toHaveBeenCalled();
+            expect(mockLogout).toHaveBeenCalled();
             // expect(localStorage.removeItem).toHaveBeenCalledWith("access_token")
             expect(mockPush).toHaveBeenCalledWith('/');
         })
@@ -194,16 +199,22 @@ describe("Header Component", () => {
 })
 
 
+describe("Products Filter", () => {
+    const getProductsMock = requisitionService.getProducts as jest.Mock;
 
-describe.skip("Products Filter", () => {
     beforeAll(() => {
         //Antes do teste, resgata o mock definido como acima
-        mockRouter.setCurrentUrl("/products")
         server.listen();
-        jest.spyOn(requisitionService, "getProducts");
     });
     beforeEach(() => {
-        (useAuth as jest.Mock).mockReturnValue({ isAuthenticated: true, user: { email: "user@fatec.sp.gov.br", cargo: "user"}, login: jest.fn(), logout: jest.fn() })
+        (useAuth as jest.Mock).mockReturnValue({ 
+            isAuthenticated: true, 
+            user: { email: "user@fatec.sp.gov.br", cargo: "user"}, 
+            login: jest.fn(), 
+            logout: jest.fn() 
+        })
+        getProductsMock.mockClear();
+        getProductsMock.mockResolvedValue(mockProducts);
     })
     afterAll(() => { 
         server.close()
@@ -215,11 +226,13 @@ describe.skip("Products Filter", () => {
 
     it("should render product list without filter", async () => {
 
-        //pesquisa a página a partir do Template para construir a "base" para os dados
+        //pesquisa a página a partir do Template em Page para construir a "base" para os dados
         //act garante atualizações de estado e espera a render
         await act( async () => {
             render(<HistoricPage />);
         })  
+
+        expect(getProductsMock).toHaveBeenCalledTimes(1); //verifica a chamada da API
 
         const caneta = screen.getByText("Caneta Teste Azul");
         const papel = screen.getByText(/papel sulfite a4 par\.\.\./i)
@@ -237,6 +250,7 @@ describe.skip("Products Filter", () => {
         await act( async () => {
             render(<HistoricTemplate />);
         })
+
         const botao = screen.getByRole('button', {
             name: /abrir filtro/i
         })
@@ -276,25 +290,170 @@ describe.skip("Products Filter", () => {
         const inputName = await screen.findByRole('textbox', {  name: /nome/i})
 
         fireEvent.change(inputName, {  target: {value: "Caneta"} })
-
         
         fireEvent.click(botaoFechar);
         
         screen.getByText(/caneta teste azul pa\.\.\./i)
-        expect(screen.queryByText("sulfite")).not.toBeInTheDocument(); 
+        await waitFor(() => {
+            expect(screen.queryByText("sulfite")).not.toBeInTheDocument(); 
+        }, { timeout: 1000 })
+        
+    })
+
+    it("should filter products by status", async () => {
+        await act( async () => {
+            render(<HistoricPage />);
+        })
+
+        const papel = screen.getByText(/papel sulfite a4 par\.\.\./i)
+        const quadroBranco = screen.getByText(/qudro branco/i)
+        expect(quadroBranco).toBeInTheDocument()
+
+
+        const botaoAbrir = screen.getByRole('button', {
+            name: /abrir filtro/i
+        })
+
+        fireEvent.click(botaoAbrir);
+        
+        const botaoFechar = screen.getByRole('button', {
+            name: /fechar filtro/i
+        })
+
+        const radioPendente = screen.getByRole('radio', {
+            name: /pendente/i
+        })
+
+        fireEvent.click(radioPendente)
+
+        fireEvent.click(botaoFechar)
+
+        expect(quadroBranco).not.toBeInTheDocument()
+        expect(papel).toBeInTheDocument()
+    })
+
+    it("should filter products by category", async () => {
+        await act( async () => {
+            render(<HistoricPage />);
+        })
+
+        const quadroBranco = screen.getByText(/qudro branco/i)
+        expect(quadroBranco).toBeInTheDocument()
+
+        const papel = screen.getByText(/papel sulfite a4 par\.\.\./i)
+        expect(papel).toBeInTheDocument()
+
+        const botaoAbrir = screen.getByRole('button', {
+            name: /abrir filtro/i
+        })
+
+        fireEvent.click(botaoAbrir);
+        
+        const botaoFechar = screen.getByRole('button', {
+            name: /fechar filtro/i
+        })
+
+        const combobox = screen.getByRole('combobox', {
+            name: /categoria/i
+        })
+
+        fireEvent.change(combobox, {  target: { value: "materiais-didaticos-pedagogicos" } })
+
+        expect(combobox).toHaveValue("materiais-didaticos-pedagogicos")
+
+        fireEvent.click(botaoFechar)
+
+        expect(quadroBranco).toBeInTheDocument()
+        expect(papel).not.toBeInTheDocument()
+    })
+
+    // it("should filter products by date", )
+
+    it("should reset filters", async () => {
+        await act( async () => {
+            render(<HistoricPage />);
+        })
+
+        const papel = screen.getByText(/papel sulfite a4 par\.\.\./i)
+        const quadroBranco = screen.getByText(/qudro branco/i)
+        expect(quadroBranco).toBeInTheDocument()
+
+        const botaoAbrir = screen.getByRole('button', {
+            name: /abrir filtro/i
+        })
+        
+        fireEvent.click(botaoAbrir);
+        
+        const botaoFechar = screen.getByRole('button', {
+            name: /fechar filtro/i
+        })
+
+        const radioPendente = screen.getByRole('radio', {
+            name: /pendente/i
+        })
+
+        fireEvent.click(radioPendente)
+
+        expect(quadroBranco).not.toBeInTheDocument()
+        expect(papel).toBeInTheDocument()
+
+        const botaoResetar = screen.getByRole('button', {
+            name: /resetar filtros/i
+        })
+
+        fireEvent.click(botaoResetar)
+        fireEvent.click(botaoFechar)
+        expect(screen.getByText(/qudro branco/i)).toBeInTheDocument()
+    })
+
+    it("should navigate through table pages", async () => {
+        await act( async () => {
+            render(<HistoricPage />);
+        })
+
+        const canetaAzul = screen.getByText(/caneta teste azul pa\.\.\./i)
+        expect(canetaAzul).toBeInTheDocument();
+
+        const botaoProximo = screen.getByRole('button', {
+            name: /próximo/i
+        })
+        const botaoAnterior = screen.getByRole('button', {
+            name: /anterior/i
+        })
+        
+        fireEvent.click(botaoProximo)
+
+        expect(canetaAzul).not.toBeInTheDocument()
+
+        fireEvent.click(botaoAnterior)
+
+        expect(screen.getByText(/caneta teste azul pa\.\.\./i)).toBeInTheDocument()
+
+        screen.debug();
+        screen.logTestingPlaygroundURL();
     })
 
 })
 
 describe("Products List", () => {
+    const getProductsMock = requisitionService.getProducts as jest.Mock;
+    const updateProductMock = requisitionService.updateProduct as jest.Mock;
+    const deleteProductMock = requisitionService.deleteProduct as jest.Mock;
+
     beforeAll(() => {
-        //Antes do teste, resgata o mock definido como acima
-        mockRouter.setCurrentUrl("/products")
         server.listen();
-        jest.spyOn(requisitionService, "getProducts");
     });
     beforeEach(() => {
-        (useAuth as jest.Mock).mockReturnValue({ isAuthenticated: true, user: { email: "user@fatec.sp.gov.br", cargo: "user"}, login: jest.fn(), logout: jest.fn() })
+        (useAuth as jest.Mock).mockReturnValue({ 
+            isAuthenticated: true, 
+            user: { email: "user@fatec.sp.gov.br", cargo: "user"}, 
+            login: jest.fn(), 
+            logout: jest.fn() 
+        })
+        getProductsMock.mockClear();
+        updateProductMock.mockClear();
+        deleteProductMock.mockClear();
+        getProductsMock.mockResolvedValue(mockProducts);
     })
     afterAll(() => { 
         server.close()
@@ -325,8 +484,122 @@ describe("Products List", () => {
         expect(negado).toBeVisible()
     })
 
+    it("should close options modal on clicking out", async () => {
+        await act( async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowCanetaAzul = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
+            name: /abrir menu/i
+        });
+
+
+        fireEvent.click(opcoesCanetaAzul)
+
+        const editar = screen.getByText(/editar/i)
+
+        const celula = screen.getByRole('cell', {
+            name: /caneta teste preta p\.\.\./i
+        })
+
+        expect(editar).toBeInTheDocument()
+
+        fireEvent.click(document.body)
+        fireEvent.click(celula)
+
+        // expect(editar).not.toBeInTheDocument();
+    })
+
     it("should open details modal on pendent item", async () => {
         await act( async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowCanetaAzul = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
+            name: /abrir menu/i
+        });
+
+        act(() => fireEvent.click(opcoesCanetaAzul))
+
+        const rowDetails = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
+        });
+
+        const detalhesCanetaAzul = within(rowDetails).getByText(/ver detalhes/i);
+
+        act(() => fireEvent.click(detalhesCanetaAzul))
+
+        const tituloDetalhes = screen.getByText("Detalhes do Produto")
+
+        expect(tituloDetalhes).toBeInTheDocument();
+
+        const botaoFechar = screen.getByRole('button', { name: /fechar/i });
+        act(() => fireEvent.click(botaoFechar));
+
+        await waitFor(() => {
+            expect(screen.queryByText("Detalhes do Produto")).not.toBeInTheDocument();
+        });
+    })
+
+    it("should edit pendent item details and call API", async () => {
+        await act( async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowPapel = screen.getByRole('row', {
+            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesPapel = within(rowPapel).getByRole('button', { name: /abrir menu/i });
+
+        fireEvent.click(opcoesPapel)
+
+        const rowDetails = screen.getByRole('row', {
+            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
+        });
+
+        const editarPapel = within(rowDetails).getByText(/editar/i);
+
+        fireEvent.click(editarPapel)
+        
+
+        const tituloEditar = screen.getByRole('heading', {  name: /editar produto/i })
+        const btnSalvar = screen.getByRole('button', {  name: /salvar/i })
+        const inputQtd = screen.getByRole('spinbutton')
+        const inputDescricao = screen.getByRole('textbox')
+
+        expect(tituloEditar).toBeInTheDocument()
+        expect(btnSalvar).toBeInTheDocument()
+
+        await act(async () => {
+            fireEvent.change(inputQtd, { target: {value: "12"}})
+            fireEvent.change(inputDescricao, { target: {value: "descricao editada"}})
+
+            fireEvent.click(btnSalvar)
+        })
+
+        await waitFor(() => {
+            expect(updateProductMock).toHaveBeenCalledWith({
+                id: "609c1f1f1b8c8b3a85f4d5f6",
+                quantidade: 12,
+                descricao: "descricao editada"
+            });
+
+            expect(screen.queryByRole('heading', {  name: /editar produto/i})).not.toBeInTheDocument(); //ver se a janela de edição fecha
+        })
+        
+    })
+
+    it("should delete pendent item and call API", async () => {
+        await act(async() => {
             render(<HistoricPage />)
         })
 
@@ -344,51 +617,41 @@ describe("Products List", () => {
             name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
         });
 
-        const detalhesCanetaAzul = within(rowDetails).getByText(/ver detalhes/i);
+        const opcaoCancelar = within(rowDetails).getByText(/cancelar/i);
 
-        fireEvent.click(detalhesCanetaAzul)
-
-        const tituloDetalhes = screen.getByText("Detalhes do Produto")
-
-        expect(tituloDetalhes).toBeInTheDocument();
+        fireEvent.click(opcaoCancelar)
     })
 
-    it("should edit pendent item details", async () => {
-        await act( async() => {
+    it("should open justification modal on denied item", async () => {
+        await act(async() => {
             render(<HistoricPage />)
         })
 
-        const rowPapel = screen.getByRole('row', {
-            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu/i
+        const rowCanetaPreta = screen.getByRole('row', {
+            name: /caneta teste preta caneta teste preta p\.\.\. 70 01\/11\/2025 negado abrir menu/i
         });
 
-        const opcoesPapel = within(rowPapel).getByText(/abrir menu/i);
+        const opcoesCanetaPreta = within(rowCanetaPreta).getByText(/abrir menu/i);
 
-        fireEvent.click(opcoesPapel)
+        fireEvent.click(opcoesCanetaPreta)
 
-        const rowDetails = screen.getByRole('row', {
-            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
-        });
+        const opcaoJustificativa = screen.getByText(/ver justificativa/i)
 
-        const editarPapel = within(rowDetails).getByText(/editar/i);
+        fireEvent.click(opcaoJustificativa)
 
-        fireEvent.click(editarPapel)
+        const tituloDetalhes = screen.getByText("Detalhes do Produto")
+        const justificativa = screen.getByText("Quantidade muito alta para compra neste momento")
+        expect(tituloDetalhes).toBeInTheDocument();
+        expect(justificativa).toBeInTheDocument();
 
-        const tituloEditar = screen.getByRole('heading', {  name: /editar produto/i})
-        const btnSalvar = screen.getByRole('button', {  name: /salvar/i})
-        const inputQtd = screen.getByRole('spinbutton')
-        const inputDescricao = screen.getByRole('textbox')
+        const botaoFechar = screen.getByRole('button', {  name: /fechar/i})
+        fireEvent.click(botaoFechar)
 
-        expect(tituloEditar).toBeInTheDocument()
-        expect(btnSalvar).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.queryByText("Quantidade muito alta para compra neste momento")).not.toBeInTheDocument();
+        })
 
-        fireEvent.change(inputQtd, { target: {value: "12"}})
-        fireEvent.change(inputDescricao, { target: {value: "descricao editada"}})
-
-        fireEvent.click(btnSalvar)
-
-        screen.debug()
-        screen.logTestingPlaygroundURL()
+        
     })
 })
 

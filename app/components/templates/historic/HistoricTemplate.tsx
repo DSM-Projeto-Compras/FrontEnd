@@ -175,7 +175,7 @@ const HistoricTemplate: React.FC = () => {
         // Chama o service para atualizar o produto
         console.log(editingProduct.id);
         await RequisitonService.updateProduct({
-          _id: editingProduct.id,
+          id: editingProduct.id,
           descricao: editDescription,
           quantidade: editQuantity,
         });
