@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 
 import Header from "../../organisms/Header";
 import { useEffect, useState } from "react";
-import requisitionService from "@/app/services/requisitionService";
+import requisitionService from "../../../../app/services/requisitionService";
 import React from "react";
-import { useAuth } from "@/app/contexts/AuthContext";
+import { useAuth } from "../../../../app/contexts/AuthContext";
 
 interface AdminUser {
     _id: string;

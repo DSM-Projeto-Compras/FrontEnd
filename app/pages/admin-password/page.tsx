@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import AdminService from "@/app/services/adminService";
-import ChangePasswordAdminTemplate from "@/app/components/templates/change-password-admin/ChangePasswordAdminTemplate";
+import AdminService from "../../../app/services/adminService";
+import ChangePasswordAdminTemplate from "../../../app/components/templates/change-password-admin/ChangePasswordAdminTemplate";
 
 const AdminPasswordPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
