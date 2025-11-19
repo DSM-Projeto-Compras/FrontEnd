@@ -37,6 +37,7 @@ const ChangePasswordAdminTemplate: React.FC<ChangePasswordAdminTemplateProps> = 
                                             Senha atual
                                         </label>
                                         <input
+                                            data-testid="senhaAtual"
                                             type="password"
                                             value={senhaAtual}
                                             onChange={onSenhaAtualChange}
@@ -49,6 +50,7 @@ const ChangePasswordAdminTemplate: React.FC<ChangePasswordAdminTemplateProps> = 
                                             Nova Senha
                                         </label>
                                         <input
+                                            data-testid="novaSenha"
                                             type="password"
                                             value={novaSenha}
                                             onChange={onNovaSenhaChange}
@@ -61,6 +63,7 @@ const ChangePasswordAdminTemplate: React.FC<ChangePasswordAdminTemplateProps> = 
                                             Confirmar Nova Senha
                                         </label>
                                         <input
+                                            data-testid="confirmarSenha"
                                             type="password"
                                             value={confirmaNovaSenha}
                                             onChange={onConfirmaNovaSenhaChange}

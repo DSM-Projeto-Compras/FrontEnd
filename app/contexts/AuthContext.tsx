@@ -61,8 +61,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const fullUser = await AuthService.getMe();
         setUser(fullUser);
-      } catch {
-        setUser({ email, cargo: response.cargo });
+      } catch(err) {
+        console.error("Erro ao obter dados do usuário (getme): ", err)
+        setUser({ nome: response.nome, email, cargo: response.cargo });
       }
 
       if (response.cargo === "admin") {
@@ -80,6 +81,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("access_token");
     localStorage.removeItem("savedCredentials");
     setIsAuthenticated(false);
+    setUser(null);
+    router.push("/")
   };
 
   return (
