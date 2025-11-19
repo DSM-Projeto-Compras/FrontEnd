@@ -45,7 +45,7 @@ jobs:
         continue-on-error: false
         run: |
           npm install --save-dev jest # Garante que jest está instalado
-          npx jest tests/pages --coverage || echo "Testes falharam, mas o fluxo continuará."
+          npx jest tests --coverage || echo "Testes falharam, mas o fluxo continuará."
           
       - name: Criar nova tag caso não exista
         id: create_initial_tag
