@@ -50,6 +50,7 @@ import AdminUsersPage from "../../../app/pages/admin-users/page";
 import AdminUsersTemplate from '../../../app/components/templates/admin-users/AdminUsersTemplate';
 import mockRouter from "next-router-mock";
 import adminService from '../../../app/services/adminService';
+import { useRouter } from 'next/navigation';
 
 
 
@@ -211,37 +212,6 @@ describe("Registered admins list", () => {
 
 
     it("should delete newers admins", async () => {
-        // await act(async () => {
-        //     render(<AdminUsersTemplate onDelete={mockOnDelete} />);
-        // })
-
-        // const targetAdminId = mockAdmins[1].id; 
-
-        // const deletarAdmin = screen.getByRole('row', {
-        //     name: /administrador dois admin2@fatec\.sp\.gov\.br/i
-        // });
-
-        // const botaoDeletar = within(deletarAdmin).getByRole('button', {
-        //     name: /deletar usuário/i
-        // });
-
-        // await act(async() => {
-        //     fireEvent.click(botaoDeletar)
-        // })
-
-        // expect(mockOnDelete).toHaveBeenCalledWith(targetAdminId);
-
-        // await waitFor(() => {
-        //     expect(deleteUserMock).toHaveBeenCalledWith(targetAdminId);
-        // });
-
-        // await waitFor(() => {
-        //     expect(getAdminsMock).toHaveBeenCalledTimes(2);
-        // });
-
-        // screen.debug();
-        // screen.logTestingPlaygroundURL()
-
         await act(async () => {
             render(<AdminUsersTemplate onDelete={mockOnDelete} />);
         })

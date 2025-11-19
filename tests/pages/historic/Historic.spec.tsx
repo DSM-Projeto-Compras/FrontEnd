@@ -658,4 +658,20 @@ describe("Products Filter", () => {
         expect(screen.getByText(/caneta teste azul pa\.\.\./i)).toBeInTheDocument()
     })
 
+    it("should redirect to / when user is not authenticated", () => {
+        const pushMock = jest.fn();
+
+        (useAuth as jest.Mock).mockReturnValue({
+            isAuthenticated: false,
+            loading: false,
+        });
+
+        jest.spyOn(require("next/navigation"), "useRouter")
+            .mockReturnValue({ push: pushMock });
+
+        render(<HistoricPage />);
+
+        expect(pushMock).toHaveBeenCalledWith("login");
+    });
+
 })

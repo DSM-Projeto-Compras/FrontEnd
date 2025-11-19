@@ -77,7 +77,7 @@ const server = setupServer(
 
 //#region Login Page Elements
 
-describe.skip("Login Page Elements", () => {
+describe("Login Page Elements", () => {
     beforeAll(() => {
         server.listen();
     });

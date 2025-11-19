@@ -306,6 +306,7 @@ describe("Admin products list", () => {
         expect(negado).toBeVisible()
     })
 
+    //#region display error test
     it("should not render products on list and display error (console.error)", async () => {
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
