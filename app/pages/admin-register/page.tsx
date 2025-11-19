@@ -10,6 +10,12 @@ const AdminRegisterPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
+  const [showSucessModal, setShowSucessModal] = useState(false);
+
+  const handleModalClose = () => {
+    setShowSucessModal(false);
+    router.push("admin-users");
+  }
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -42,8 +48,7 @@ const AdminRegisterPage: React.FC = () => {
         senha,
         role: "admin",
       });
-      alert("Administrador criado com sucesso!");
-      router.push("admin-users");
+      setShowSucessModal(true);
     } catch (error: any) {
       if (
         error.response &&
@@ -67,6 +72,8 @@ const AdminRegisterPage: React.FC = () => {
       <AdminRegisterTemplate
         onRegister={handleRegister}
         errorMessages={errorMessages}
+        showSucessModal={showSucessModal}
+        onSucessModalClose={handleModalClose}
       />
     )
   );

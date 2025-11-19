@@ -33,8 +33,6 @@ interface LoginBody {
 
 const server = setupServer(
     http.post<any, LoginBody, any>(`${env.apiBaseUrl}/logins`, async ({ request }) => {
-        //com isso não é preciso passar pelo token de autenticação
-
             const body = await request.json() as LoginBody;
             const { email } = body;
             
@@ -77,7 +75,7 @@ const server = setupServer(
     })
 );
 
-
+//#region Login Page Elements
 
 describe.skip("Login Page Elements", () => {
     beforeAll(() => {

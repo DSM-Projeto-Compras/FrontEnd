@@ -65,7 +65,9 @@ const server = setupServer(
 )
 
 
-describe("Login Page Elements", () => {
+//#region Register Page Elements 
+
+describe("Register Page Elements", () => {
     beforeAll(() => {
         server.listen();
     });
@@ -159,10 +161,6 @@ describe("Login Page Elements", () => {
         expect(errorMessage).toBeVisible();
 
         expect(mockRouter.asPath).toEqual("/");
-
-        // screen.debug();
-
-        // await waitFor(() => expect(Router.push).toHaveAccessibleErrorMessage('As senhas não coincidem. Por favor, verifique.'), {timeout: 5000, interval: 100})
     })
 
     it("should display specific API validation error message", async () => {

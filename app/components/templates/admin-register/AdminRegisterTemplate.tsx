@@ -3,6 +3,7 @@
 import { registerValidationSchema } from "../../../../app/validators/registerValidation";
 import Header from "../../organisms/Header"
 import { useFormik } from "formik";
+import SuccessModal from "../../organisms/SucessModal";
 
 
 const AdminRegisterTemplate: React.FC<{
@@ -13,7 +14,9 @@ const AdminRegisterTemplate: React.FC<{
         confirmPassword: string
     ) => void;
     errorMessages?: string[];
-}> = ({ onRegister, errorMessages = [] }) => {
+    showSucessModal: boolean;
+    onSucessModalClose: () => void;
+}> = ({ onRegister, errorMessages = [], showSucessModal, onSucessModalClose  }) => {
     const formik = useFormik({
         initialValues: {
             name: "",
@@ -172,6 +175,12 @@ const AdminRegisterTemplate: React.FC<{
                     </div>
                 </div>
             </div>
+
+            <SuccessModal 
+                message="Cadastro realizado com sucesso!"
+                isOpen={showSucessModal}
+                onClose={onSucessModalClose}
+            />
         </div>
     )
 }

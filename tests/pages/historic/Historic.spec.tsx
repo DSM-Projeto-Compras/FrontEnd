@@ -101,7 +101,6 @@ const mockProducts = [
 ]
 
 import { render, screen, waitFor, fireEvent, act, within } from "@testing-library/react";
-import mockRouter from "next-router-mock";
 import { setupServer } from "msw/node";
 import { http } from "msw";
 import { env } from "../../../config/env"
@@ -141,6 +140,8 @@ const server = setupServer(
         }
     ),
 )
+
+//#region describe Header Component
 
 describe("Header Component", () => {
     //obs: aqui está sendo testado o Header, mas levando em consideração que está com uma estrutura única para a página de Histórico
@@ -197,6 +198,233 @@ describe("Header Component", () => {
         expect(mockPush).toHaveBeenCalledWith('historic')
     })
 })
+
+//#endregion describe Header Component
+//#region describe Products List
+
+describe("Products List", () => {
+    const getProductsMock = requisitionService.getProducts as jest.Mock;
+    const updateProductMock = requisitionService.updateProduct as jest.Mock;
+    const deleteProductMock = requisitionService.deleteProduct as jest.Mock;
+
+    beforeAll(() => {
+        server.listen();
+    });
+    beforeEach(() => {
+        (useAuth as jest.Mock).mockReturnValue({ 
+            isAuthenticated: true, 
+            user: { email: "user@fatec.sp.gov.br", cargo: "user"}, 
+            login: jest.fn(), 
+            logout: jest.fn() 
+        })
+        getProductsMock.mockClear();
+        updateProductMock.mockClear();
+        deleteProductMock.mockClear();
+        getProductsMock.mockResolvedValue(mockProducts);
+    })
+    afterAll(() => { 
+        server.close()
+    });
+    afterEach(() => {
+        server.resetHandlers();
+        jest.clearAllMocks();
+    })
+
+    it("should render 'denied', 'approved' and 'pendent' products on list", async () => {
+
+        await act( async () => {
+            render(<HistoricPage />);
+        })  
+
+        const row = screen.getByRole('row', {
+             name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const caneta = screen.getByText("Caneta Teste Preta");
+        const pendente = within(row).getByText(/pendente/i); //para valores repetidos isolar uma célula da tabela
+        const aprovado = screen.getByText("Aprovado");
+        const negado = screen.getByText("Negado");
+
+        expect(caneta).toBeVisible()
+        expect(pendente).toBeVisible()
+        expect(aprovado).toBeVisible()
+        expect(negado).toBeVisible()
+    })
+
+    it("should close options modal on clicking out", async () => {
+        await act( async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowCanetaAzul = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
+            name: /abrir menu/i
+        });
+
+
+        fireEvent.click(opcoesCanetaAzul)
+
+        const editar = screen.getByText(/editar/i)
+
+        const celula = screen.getByRole('cell', {
+            name: /caneta teste preta p\.\.\./i
+        })
+
+        expect(editar).toBeInTheDocument()
+
+        fireEvent.click(document.body)
+        fireEvent.click(celula)
+
+        // expect(editar).not.toBeInTheDocument();
+    })
+
+    it("should open details modal on pendent item", async () => {
+        await act( async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowCanetaAzul = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
+            name: /abrir menu/i
+        });
+
+        act(() => fireEvent.click(opcoesCanetaAzul))
+
+        const rowDetails = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
+        });
+
+        const detalhesCanetaAzul = within(rowDetails).getByText(/ver detalhes/i);
+
+        act(() => fireEvent.click(detalhesCanetaAzul))
+
+        const tituloDetalhes = screen.getByText("Detalhes do Produto")
+
+        expect(tituloDetalhes).toBeInTheDocument();
+
+        const botaoFechar = screen.getByRole('button', { name: /fechar/i });
+        act(() => fireEvent.click(botaoFechar));
+
+        await waitFor(() => {
+            expect(screen.queryByText("Detalhes do Produto")).not.toBeInTheDocument();
+        });
+    })
+
+    it("should edit pendent item details and call API", async () => {
+        await act( async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowPapel = screen.getByRole('row', {
+            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesPapel = within(rowPapel).getByRole('button', { name: /abrir menu/i });
+
+        fireEvent.click(opcoesPapel)
+
+        const rowDetails = screen.getByRole('row', {
+            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
+        });
+
+        const editarPapel = within(rowDetails).getByText(/editar/i);
+
+        fireEvent.click(editarPapel)
+        
+
+        const tituloEditar = screen.getByRole('heading', {  name: /editar produto/i })
+        const btnSalvar = screen.getByRole('button', {  name: /salvar/i })
+        const inputQtd = screen.getByRole('spinbutton')
+        const inputDescricao = screen.getByRole('textbox')
+
+        expect(tituloEditar).toBeInTheDocument()
+        expect(btnSalvar).toBeInTheDocument()
+
+        await act(async () => {
+            fireEvent.change(inputQtd, { target: {value: "12"}})
+            fireEvent.change(inputDescricao, { target: {value: "descricao editada"}})
+
+            fireEvent.click(btnSalvar)
+        })
+
+        await waitFor(() => {
+            expect(updateProductMock).toHaveBeenCalledWith({
+                id: "609c1f1f1b8c8b3a85f4d5f6",
+                quantidade: 12,
+                descricao: "descricao editada"
+            });
+
+            expect(screen.queryByRole('heading', {  name: /editar produto/i})).not.toBeInTheDocument(); //ver se a janela de edição fecha
+        })
+        
+    })
+
+    it("should delete pendent item and call API", async () => {
+        await act(async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowCanetaAzul = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
+        });
+
+        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
+            name: /abrir menu/i
+        });
+
+        fireEvent.click(opcoesCanetaAzul)
+
+        const rowDetails = screen.getByRole('row', {
+            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
+        });
+
+        const opcaoCancelar = within(rowDetails).getByText(/cancelar/i);
+
+        fireEvent.click(opcaoCancelar)
+
+        
+        // #region TODO deletar item
+    })
+
+    it("should open justification modal on denied item", async () => {
+        await act(async() => {
+            render(<HistoricPage />)
+        })
+
+        const rowCanetaPreta = screen.getByRole('row', {
+            name: /caneta teste preta caneta teste preta p\.\.\. 70 01\/11\/2025 negado abrir menu/i
+        });
+
+        const opcoesCanetaPreta = within(rowCanetaPreta).getByText(/abrir menu/i);
+
+        fireEvent.click(opcoesCanetaPreta)
+
+        const opcaoJustificativa = screen.getByText(/ver justificativa/i)
+
+        fireEvent.click(opcaoJustificativa)
+
+        const tituloDetalhes = screen.getByText("Detalhes do Produto")
+        const justificativa = screen.getByText("Quantidade muito alta para compra neste momento")
+        expect(tituloDetalhes).toBeInTheDocument();
+        expect(justificativa).toBeInTheDocument();
+
+        const botaoFechar = screen.getByRole('button', {  name: /fechar/i})
+        fireEvent.click(botaoFechar)
+
+        await waitFor(() => {
+            expect(screen.queryByText("Quantidade muito alta para compra neste momento")).not.toBeInTheDocument();
+        })
+    })
+})
+
+
+//#region Describe products filter
 
 
 describe("Products Filter", () => {
@@ -428,230 +656,6 @@ describe("Products Filter", () => {
         fireEvent.click(botaoAnterior)
 
         expect(screen.getByText(/caneta teste azul pa\.\.\./i)).toBeInTheDocument()
-
-        screen.debug();
-        screen.logTestingPlaygroundURL();
     })
 
 })
-
-describe("Products List", () => {
-    const getProductsMock = requisitionService.getProducts as jest.Mock;
-    const updateProductMock = requisitionService.updateProduct as jest.Mock;
-    const deleteProductMock = requisitionService.deleteProduct as jest.Mock;
-
-    beforeAll(() => {
-        server.listen();
-    });
-    beforeEach(() => {
-        (useAuth as jest.Mock).mockReturnValue({ 
-            isAuthenticated: true, 
-            user: { email: "user@fatec.sp.gov.br", cargo: "user"}, 
-            login: jest.fn(), 
-            logout: jest.fn() 
-        })
-        getProductsMock.mockClear();
-        updateProductMock.mockClear();
-        deleteProductMock.mockClear();
-        getProductsMock.mockResolvedValue(mockProducts);
-    })
-    afterAll(() => { 
-        server.close()
-    });
-    afterEach(() => {
-        server.resetHandlers();
-        jest.clearAllMocks();
-    })
-
-    it("should render 'denied', 'approved' and 'pendent' products on list", async () => {
-
-        await act( async () => {
-            render(<HistoricPage />);
-        })  
-
-        const row = screen.getByRole('row', {
-             name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu/i
-        });
-
-        const caneta = screen.getByText("Caneta Teste Preta");
-        const pendente = within(row).getByText(/pendente/i); //para valores repetidos isolar uma célula da tabela
-        const aprovado = screen.getByText("Aprovado");
-        const negado = screen.getByText("Negado");
-
-        expect(caneta).toBeVisible()
-        expect(pendente).toBeVisible()
-        expect(aprovado).toBeVisible()
-        expect(negado).toBeVisible()
-    })
-
-    it("should close options modal on clicking out", async () => {
-        await act( async() => {
-            render(<HistoricPage />)
-        })
-
-        const rowCanetaAzul = screen.getByRole('row', {
-            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
-        });
-
-        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
-            name: /abrir menu/i
-        });
-
-
-        fireEvent.click(opcoesCanetaAzul)
-
-        const editar = screen.getByText(/editar/i)
-
-        const celula = screen.getByRole('cell', {
-            name: /caneta teste preta p\.\.\./i
-        })
-
-        expect(editar).toBeInTheDocument()
-
-        fireEvent.click(document.body)
-        fireEvent.click(celula)
-
-        // expect(editar).not.toBeInTheDocument();
-    })
-
-    it("should open details modal on pendent item", async () => {
-        await act( async() => {
-            render(<HistoricPage />)
-        })
-
-        const rowCanetaAzul = screen.getByRole('row', {
-            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
-        });
-
-        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
-            name: /abrir menu/i
-        });
-
-        act(() => fireEvent.click(opcoesCanetaAzul))
-
-        const rowDetails = screen.getByRole('row', {
-            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
-        });
-
-        const detalhesCanetaAzul = within(rowDetails).getByText(/ver detalhes/i);
-
-        act(() => fireEvent.click(detalhesCanetaAzul))
-
-        const tituloDetalhes = screen.getByText("Detalhes do Produto")
-
-        expect(tituloDetalhes).toBeInTheDocument();
-
-        const botaoFechar = screen.getByRole('button', { name: /fechar/i });
-        act(() => fireEvent.click(botaoFechar));
-
-        await waitFor(() => {
-            expect(screen.queryByText("Detalhes do Produto")).not.toBeInTheDocument();
-        });
-    })
-
-    it("should edit pendent item details and call API", async () => {
-        await act( async() => {
-            render(<HistoricPage />)
-        })
-
-        const rowPapel = screen.getByRole('row', {
-            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu/i
-        });
-
-        const opcoesPapel = within(rowPapel).getByRole('button', { name: /abrir menu/i });
-
-        fireEvent.click(opcoesPapel)
-
-        const rowDetails = screen.getByRole('row', {
-            name: /papel sulfite papel sulfite a4 par\.\.\. 50 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
-        });
-
-        const editarPapel = within(rowDetails).getByText(/editar/i);
-
-        fireEvent.click(editarPapel)
-        
-
-        const tituloEditar = screen.getByRole('heading', {  name: /editar produto/i })
-        const btnSalvar = screen.getByRole('button', {  name: /salvar/i })
-        const inputQtd = screen.getByRole('spinbutton')
-        const inputDescricao = screen.getByRole('textbox')
-
-        expect(tituloEditar).toBeInTheDocument()
-        expect(btnSalvar).toBeInTheDocument()
-
-        await act(async () => {
-            fireEvent.change(inputQtd, { target: {value: "12"}})
-            fireEvent.change(inputDescricao, { target: {value: "descricao editada"}})
-
-            fireEvent.click(btnSalvar)
-        })
-
-        await waitFor(() => {
-            expect(updateProductMock).toHaveBeenCalledWith({
-                id: "609c1f1f1b8c8b3a85f4d5f6",
-                quantidade: 12,
-                descricao: "descricao editada"
-            });
-
-            expect(screen.queryByRole('heading', {  name: /editar produto/i})).not.toBeInTheDocument(); //ver se a janela de edição fecha
-        })
-        
-    })
-
-    it("should delete pendent item and call API", async () => {
-        await act(async() => {
-            render(<HistoricPage />)
-        })
-
-        const rowCanetaAzul = screen.getByRole('row', {
-            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
-        });
-
-        const opcoesCanetaAzul = within(rowCanetaAzul).getByRole('button', {
-            name: /abrir menu/i
-        });
-
-        fireEvent.click(opcoesCanetaAzul)
-
-        const rowDetails = screen.getByRole('row', {
-            name: /caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu ver detalhes editar cancelar/i
-        });
-
-        const opcaoCancelar = within(rowDetails).getByText(/cancelar/i);
-
-        fireEvent.click(opcaoCancelar)
-    })
-
-    it("should open justification modal on denied item", async () => {
-        await act(async() => {
-            render(<HistoricPage />)
-        })
-
-        const rowCanetaPreta = screen.getByRole('row', {
-            name: /caneta teste preta caneta teste preta p\.\.\. 70 01\/11\/2025 negado abrir menu/i
-        });
-
-        const opcoesCanetaPreta = within(rowCanetaPreta).getByText(/abrir menu/i);
-
-        fireEvent.click(opcoesCanetaPreta)
-
-        const opcaoJustificativa = screen.getByText(/ver justificativa/i)
-
-        fireEvent.click(opcaoJustificativa)
-
-        const tituloDetalhes = screen.getByText("Detalhes do Produto")
-        const justificativa = screen.getByText("Quantidade muito alta para compra neste momento")
-        expect(tituloDetalhes).toBeInTheDocument();
-        expect(justificativa).toBeInTheDocument();
-
-        const botaoFechar = screen.getByRole('button', {  name: /fechar/i})
-        fireEvent.click(botaoFechar)
-
-        await waitFor(() => {
-            expect(screen.queryByText("Quantidade muito alta para compra neste momento")).not.toBeInTheDocument();
-        })
-
-        
-    })
-})
-
