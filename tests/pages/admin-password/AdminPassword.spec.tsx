@@ -180,26 +180,52 @@ describe("Admin Change Password Elements", () => {
         expect(screen.getByText(/senha atual incorreta\./i)).toBeInTheDocument()
     })
 
-    it("should redirect home if not authenticated", async () => {
+
+    //#region linhas loading/isAuthenticated
+
+    it("should redirect to / when user is not authenticated", () => {
+        const pushMock = jest.fn();
+
         (useAuth as jest.Mock).mockReturnValue({
             isAuthenticated: false,
             loading: false,
-            login: jest.fn(),
-            logout: jest.fn(),
-            user: null
-        })
-
-        const pushMock = jest.fn();
-
-        (useRouter as jest.Mock).mockReturnValue({
-            push: pushMock
         });
 
-        render(<AdminPasswordPage />)
+        jest.spyOn(require("next/navigation"), "useRouter")
+            .mockReturnValue({ push: pushMock });
 
-        await waitFor(() => {
-            expect(pushMock).toHaveBeenCalledWith("/");
+        render(<AdminPasswordPage />);
+
+        expect(pushMock).toHaveBeenCalledWith("/");
+    });
+
+    it("should return null when loading", () => {
+        
+        (useAuth as jest.Mock).mockReturnValue({
+            isAuthenticated: true,
+            loading: true,
         });
+
+        const { container } = render(<AdminPasswordPage />);
+
+        expect(container.firstChild).toBeNull();
+    });
+
+    it("should use fallback success message when API returns no message", async () => {
+        server.use(
+            http.patch(`${env.apiBaseUrl}/logins/change`, async () => {
+            return Response.json({}, { status: 200 }) // sem message
+            })
+        );
+
+        await act(async () => render(<AdminPasswordPage />))
+
+        fireEvent.change(screen.getByTestId("senhaAtual"), { target: { value: "Valida" } })
+        fireEvent.change(screen.getByTestId("novaSenha"), { target: { value: "Senha@nova1" } })
+        fireEvent.change(screen.getByTestId("confirmarSenha"), { target: { value: "Senha@nova1" } })
+
+        await act(async () => fireEvent.click(screen.getByRole("button", { name: /alterar senha/i })))
+
+        expect(screen.getByText("Senha alterada com sucesso!")).toBeInTheDocument()
     })
-
 })

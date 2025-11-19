@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 //mocks
 
 jest.mock('next/router', ()=> ({push: jest.fn()}))
@@ -271,5 +272,36 @@ describe("Requisition Page", () => {
         render(<RequisitionPage />);
 
         expect(pushMock).toHaveBeenCalledWith("login");
+    });
+    
+
+    //#region linhas loading/isAuthenticated
+
+    it("should redirect to / when user is not authenticated", () => {
+        const pushMock = jest.fn();
+
+        (useAuth as jest.Mock).mockReturnValue({
+            isAuthenticated: false,
+            loading: false,
+        });
+
+        jest.spyOn(require("next/navigation"), "useRouter")
+            .mockReturnValue({ push: pushMock });
+
+        render(<RequisitionPage />);
+
+        expect(pushMock).toHaveBeenCalledWith("login");
+    });
+
+    it("should return null when loading", () => {
+        
+        (useAuth as jest.Mock).mockReturnValue({
+            isAuthenticated: true,
+            loading: true,
+        });
+
+        const { container } = render(<RequisitionPage />);
+
+        expect(container.firstChild).toBeNull();
     });
 })

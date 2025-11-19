@@ -164,7 +164,7 @@ const mockProducts = [
     }
 ]
 
-import { render, screen, waitFor, fireEvent, act, within } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act, within, getAllByText, getAllByRole } from "@testing-library/react";
 import { setupServer } from "msw/node";
 import { http } from "msw";
 import { env } from "../../../config/env"
@@ -527,6 +527,39 @@ describe("Admin products list", () => {
 
         consoleErrorSpy.mockRestore();
     })
+
+
+
+    //#region linhas loading/isAuthenticated
+
+    it("should redirect to / when user is not authenticated", () => {
+        const pushMock = jest.fn();
+
+        (useAuth as jest.Mock).mockReturnValue({
+            isAuthenticated: false,
+            loading: false,
+        });
+
+        jest.spyOn(require("next/navigation"), "useRouter")
+            .mockReturnValue({ push: pushMock });
+
+        render(<AdminDashboardPage />);
+
+        expect(pushMock).toHaveBeenCalledWith("login");
+    });
+
+    it("should return null when loading", () => {
+        
+        (useAuth as jest.Mock).mockReturnValue({
+            isAuthenticated: true,
+            loading: true,
+        });
+
+        const { container } = render(<AdminDashboardPage />);
+
+        expect(container.firstChild).toBeNull();
+    });
+
 })
 
 
@@ -701,7 +734,42 @@ describe("Products Filter", () => { //Testes repetidos, se possível, unir compo
         expect(papel).not.toBeInTheDocument()
     })
 
-    // it("should filter products by date", )
+    it("should filter products by date", async () => {
+        await act( async () => {
+            render(<AdminDashboardPage />);
+        })
+
+        const canetaAzul = screen.getByText(/caneta teste azul pa\.\.\./i) //data - 10/12/2023
+        
+        expect(canetaAzul).toBeInTheDocument()
+
+        const botaoAbrir = screen.getByRole('button', {
+            name: /abrir filtro/i
+        })
+
+        fireEvent.click(botaoAbrir);
+
+        const dataInicial = screen.getByLabelText(/data inicial:/i)
+        const dataFinal = screen.getByLabelText(/data final:/i)
+
+        const botaoFechar = screen.getByRole('button', {
+            name: /fechar filtro/i
+        })
+
+        await act(async () => fireEvent.change(dataFinal, { target: { value: "2024-11-30"}}))
+        await act(async () => fireEvent.change(dataInicial, { target: { value: "2022-11-30"}}))
+
+        fireEvent.click(botaoFechar)
+
+        const row = screen.getByRole('row', {
+            name: /fulano da silva caneta teste azul caneta teste azul pa\.\.\. 99 01\/12\/2023 pendente abrir menu/i
+        });
+
+        expect(within(row).getByRole('cell', {
+            name: /01\/12\/2023/i
+        })).toBeInTheDocument();
+    })
+
 
     it("should reset filters", async () => {
         await act( async () => {

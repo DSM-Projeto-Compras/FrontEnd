@@ -209,3 +209,44 @@ describe("Login Page Elements", () => {
 
 })
 
+//#region Validação UI
+
+describe("LoginTemplate validation UI", () => {
+    it("should show email validation error when field is touched and invalid", async () => {
+        render(
+            <AuthProvider>
+                <LoginPage />
+            </AuthProvider>
+        );
+
+        const emailField = screen.getByTestId("email");
+
+        fireEvent.blur(emailField);
+
+        // Submeter sem preencher
+        fireEvent.submit(emailField.closest("form")!);
+
+        const emailError = await screen.findByText(/email é obrigatório/i);
+
+        expect(emailError).toBeVisible();
+    });
+
+    it("should show password validation error when field is touched and invalid", async () => {
+        render(
+            <AuthProvider>
+                <LoginPage />
+            </AuthProvider>
+        );
+
+        const passwordField = screen.getByTestId("password");
+
+        fireEvent.blur(passwordField);
+
+        // Submeter sem preencher
+        fireEvent.submit(passwordField.closest("form")!);
+
+        const passwordError = await screen.findByText(/senha é obrigatória/i);
+
+        expect(passwordError).toBeVisible();
+    });
+});

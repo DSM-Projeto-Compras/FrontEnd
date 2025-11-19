@@ -276,8 +276,6 @@ const AdminDashboardTemplate: React.FC = () => {
         return "bg-yellow-500";
       case "Negado":
         return "bg-red-500";
-      default:
-        return "bg-gray-500";
     }
   };
 

@@ -242,8 +242,6 @@ describe("Registered admins list", () => {
             expect(getAdminsMock).toHaveBeenCalledTimes(2);
         });
         
-        // screen.debug();
-        // screen.logTestingPlaygroundURL()
     })
 
     it("should prevent deletion of the logged-in user", async () => {
@@ -275,4 +273,34 @@ describe("Registered admins list", () => {
             expect(getAdminsMock).toHaveBeenCalledTimes(1);
         });
     })
+
+    //#region linhas loading/isAuthenticated
+
+    it("should redirect to / when user is not authenticated", () => {
+        const pushMock = jest.fn();
+
+        (useAuth as jest.Mock).mockReturnValue({
+            isAuthenticated: false,
+            loading: false,
+        });
+
+        jest.spyOn(require("next/navigation"), "useRouter")
+            .mockReturnValue({ push: pushMock });
+
+        render(<AdminUsersPage />);
+
+        expect(pushMock).toHaveBeenCalledWith("/");
+    });
+
+    it("should return null when loading", () => {
+        
+        (useAuth as jest.Mock).mockReturnValue({
+            isAuthenticated: true,
+            loading: true,
+        });
+
+        const { container } = render(<AdminUsersPage />);
+
+        expect(container.firstChild).toBeNull();
+    });
 })
