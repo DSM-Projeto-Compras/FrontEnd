@@ -1,0 +1,4 @@
+import 'dotenv/config';
+
+
+process.env.NEXT_PUBLIC_API_BASEURL= "http://localhost:4000/api"

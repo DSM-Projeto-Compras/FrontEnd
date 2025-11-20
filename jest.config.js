@@ -35,4 +35,5 @@ module.exports = {
     customExportConditions: [""],
   },
   testEnvironment: "jest-fixed-jsdom",
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 };
