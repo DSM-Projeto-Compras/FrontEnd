@@ -1,10 +1,10 @@
 "use client";
 
-import AdminUsersTemplate from "@/app/components/templates/admin-users/AdminUsersTemplate";
-import { useAuth } from "@/app/contexts/AuthContext";
+import AdminUsersTemplate from "../../../app/components/templates/admin-users/AdminUsersTemplate";
+import { useAuth } from "../../../app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
-import AdminService from "@/app/services/adminService";
+import AdminService from "../../../app/services/adminService";
 
 const AdminUsersPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();

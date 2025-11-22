@@ -44,6 +44,7 @@ const ChangePasswordAdminTemplate = ({
                                             Senha atual
                                         </label>
                                         <input
+                                            data-testid="senhaAtual"
                                             type="password"
                                             name="currentPassword"
                                             id="currentPassword"
@@ -61,6 +62,7 @@ const ChangePasswordAdminTemplate = ({
                                             Nova Senha
                                         </label>
                                         <input
+                                            data-testid="novaSenha"
                                             type="password"
                                             name="newPassword"
                                             id="newPassword"
@@ -78,6 +80,7 @@ const ChangePasswordAdminTemplate = ({
                                             Confirmar Nova Senha
                                         </label>
                                         <input
+                                            data-testid="confirmarSenha"
                                             type="password"
                                             name="confirmNewPassword"
                                             id="confirmNewPassword"
