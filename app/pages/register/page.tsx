@@ -44,10 +44,10 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <RegisterTemplate
-      onRegister={handleRegister}
-      errorMessages={errorMessages}
-    />
+      <RegisterTemplate
+        onRegister={handleRegister}
+        errorMessages={errorMessages}
+      />
   );
 };
 
