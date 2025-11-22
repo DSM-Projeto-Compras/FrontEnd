@@ -11,27 +11,24 @@ const ChangePasswordPage: React.FC = () => {
   const [mensagem, setMensagem] = React.useState("");
   const [erro, setErro] = React.useState("");
 
+  const clearMessages = () => {
+    setErro("");
+    setMensagem("");
+  };
+
   const handleSendEmail = async () => {
+    clearMessages();
     try {
       const res = await AuthService.forgotPassword(email);
       setMensagem(res.message);
       setStep(2);
     } catch (error: any) {
-      setErro(error.response?.data?.message || "");
+      setErro(error.response?.data?.message || "Erro ao enviar email");
     }
   };
 
-  /*const handleVerifyCode = async () => {
-    try {
-      const res = await AuthService.verifyCode(email, codigo);
-      setMensagem(res.message);
-      setStep(3);
-    } catch (error: any) {
-      setErro(error.response?.data?.message || "Erro ao verificar código");
-    }
-  };*/
-
   const handleResetPassword = async () => {
+    clearMessages();
     try {
       const res = await AuthService.resetPassword(email, codigo, novaSenha);
       setMensagem(res.message);
@@ -54,7 +51,6 @@ const ChangePasswordPage: React.FC = () => {
       mensagem={mensagem}
       erro={erro}
       handleSendEmail={handleSendEmail}
-      //handleVerifyCode={handleVerifyCode}
       handleResetPassword={handleResetPassword}
     />
   );

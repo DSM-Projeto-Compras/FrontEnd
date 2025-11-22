@@ -1,27 +1,34 @@
 import React from "react";
+import { useFormik } from "formik";
+import { changePasswordValidationSchema } from "@/app/validators/changePasswordValidation";
 import Header from "../../organisms/Header";
 
 interface ChangePasswordAdminTemplateProps {
-  senhaAtual: string;
-  novaSenha: string;
-  confirmaNovaSenha: string;
-  onSenhaAtualChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onNovaSenhaChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onConfirmaNovaSenhaChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (currentPassword: string, newPassword: string, confirmNewPassword: string) => Promise<boolean>;
   mensagem: string;
 }
 
-const ChangePasswordAdminTemplate: React.FC<ChangePasswordAdminTemplateProps> = ({
-  senhaAtual,
-  novaSenha,
-  confirmaNovaSenha,
-  onSenhaAtualChange,
-  onNovaSenhaChange,
-  onConfirmaNovaSenhaChange,
-  onSubmit,
-  mensagem,
-}) => {
+const ChangePasswordAdminTemplate = ({ 
+    onSubmit,
+    mensagem
+  }: ChangePasswordAdminTemplateProps) => {
+
+  const formik = useFormik({
+    initialValues: {
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+    },
+    validationSchema: changePasswordValidationSchema,
+    onSubmit: async (values, helpers) => {
+      const success = await onSubmit(values.currentPassword, values.newPassword, values.confirmNewPassword);
+
+      if(success){
+        helpers.resetForm;
+      }
+    }
+});
+
   return (
         <div>
             <Header admin={true} />
@@ -31,18 +38,23 @@ const ChangePasswordAdminTemplate: React.FC<ChangePasswordAdminTemplateProps> = 
                         <h1 className="text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">Alterar senha</h1>
                         <div className="flex flex-col">
                             <div className="w-full max-w-md">
-                                <form onSubmit={onSubmit} className="space-y-4 md:space-y-6">
+                                <form onSubmit={formik.handleSubmit} className="space-y-4 md:space-y-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
                                             Senha atual
                                         </label>
                                         <input
                                             type="password"
-                                            value={senhaAtual}
-                                            onChange={onSenhaAtualChange}
+                                            name="currentPassword"
+                                            id="currentPassword"
+                                            value={formik.values.currentPassword}
+                                            onChange={formik.handleChange}
                                             className="bg-gray-50 border border-gray-300 rounded-lg w-full p-2.5"
                                             required
                                         />
+                                        {formik.touched.currentPassword && formik.errors.currentPassword && (
+                                            <p className="text-red-600 text-sm">{formik.errors.currentPassword}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
@@ -50,11 +62,16 @@ const ChangePasswordAdminTemplate: React.FC<ChangePasswordAdminTemplateProps> = 
                                         </label>
                                         <input
                                             type="password"
-                                            value={novaSenha}
-                                            onChange={onNovaSenhaChange}
+                                            name="newPassword"
+                                            id="newPassword"
+                                            value={formik.values.newPassword}
+                                            onChange={formik.handleChange}
                                             className="bg-gray-50 border border-gray-300 rounded-lg w-full p-2.5"
                                             required
                                         />
+                                        {formik.touched.newPassword && formik.errors.newPassword && (
+                                            <p className="text-red-600 text-sm">{formik.errors.newPassword}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
@@ -62,11 +79,16 @@ const ChangePasswordAdminTemplate: React.FC<ChangePasswordAdminTemplateProps> = 
                                         </label>
                                         <input
                                             type="password"
-                                            value={confirmaNovaSenha}
-                                            onChange={onConfirmaNovaSenhaChange}
+                                            name="confirmNewPassword"
+                                            id="confirmNewPassword"
+                                            value={formik.values.confirmNewPassword}
+                                            onChange={formik.handleChange}
                                             className="bg-gray-50 border border-gray-300 rounded-lg w-full p-2.5"
                                             required
                                         />
+                                        {formik.touched.confirmNewPassword && formik.errors.confirmNewPassword && (
+                                            <p className="text-red-600 text-sm">{formik.errors.confirmNewPassword}</p>
+                                        )}
                                     </div>
                                     <button type="submit" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Alterar senha</button>
                                      {mensagem && (
