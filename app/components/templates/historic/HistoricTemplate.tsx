@@ -546,7 +546,7 @@ const HistoricTemplate: React.FC = () => {
       </div>
 
       {isEditModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
           <div className="bg-white p-6 rounded-lg w-[600px]">
             {" "}
             {/* Largura fixa de 500px */}
@@ -592,7 +592,7 @@ const HistoricTemplate: React.FC = () => {
       )}
 
       {isDetailModalOpen && viewingProduct && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
           <div className="bg-white p-6 rounded-lg w-[600px]">
             {/* Largura fixa de 600px */}
             <h2 className="text-xl font-bold mb-4">Detalhes do Produto</h2>
