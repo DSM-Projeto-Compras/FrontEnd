@@ -103,7 +103,6 @@ const RequisitionTemplate: React.FC = () => {
     setFieldValue: (field: string, value: any) => void
   ) => {
     try {
-      // Use the backend proxy that already scrapes/parses the BEC and returns structured details
       const details = await SearchBecService.searchAndGetDetails(productName);
       if (details) {
         const newProductDetails = {
