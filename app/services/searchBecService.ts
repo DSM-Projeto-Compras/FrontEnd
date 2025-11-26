@@ -1,73 +1,53 @@
 // src/services/searchBecService.ts
-const BASE_URL = "https://www.bec.sp.gov.br/BEC_Catalogo_ui";
+import axios from 'axios';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASEURL || '';
 
 const SearchBecService = {
+  // Keep the same return shape used by the client (old BEC .asmx returned { d: [...] })
   getProducts: async (prefixText: string, count: number = 20) => {
-    const url = `${BASE_URL}/WebService/AutoComplete.asmx/GetItensList`;
-    const headers = {
-      "Content-Type": "application/json",
-    };
-    const body = JSON.stringify({ prefixText, count });
-
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers,
-        body,
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao buscar produtos.");
-      }
-      const data = await response.json();
-      return data;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+      const resp = await axios.post(
+        `${API_BASE}/bec/products`,
+        { prefixText, count },
+        { headers: token ? { 'access-token': token } : undefined }
+      );
+      // backend returns { success, count, data }
+      return { d: resp.data?.data || [] };
     } catch (error) {
-      console.error(error);
+      console.error('Erro getProducts (proxy):', error);
       return { d: [] };
     }
   },
 
-  searchProduct: async (description: string) => {
-    const url = `${BASE_URL}/CatalogoPesquisa3.aspx?chave=&pesquisa=Y&cod_id=&ds_item=${encodeURIComponent(
-      description
-    )}`;
-
+  // Request combined search+details from backend which returns structured JSON
+  searchAndGetDetails: async (description: string) => {
     try {
-      const response = await fetch(url, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao buscar o produto.");
-      }
-
-      const data = await response.text();
-      return data;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+      const resp = await axios.post(
+        `${API_BASE}/bec/search-details`,
+        { description },
+        { headers: token ? { 'access-token': token } : undefined }
+      );
+      // resp.data should contain .details (see controller)
+      return resp.data?.details || null;
     } catch (error) {
-      console.error(error);
-      return "";
+      console.error('Erro searchAndGetDetails (proxy):', error);
+      return null;
     }
   },
 
   getProductDetails: async (cod_id: string) => {
-    const url = `${BASE_URL}/CatalogDetalheNovo.aspx?chave=&cod_id=${encodeURIComponent(
-      cod_id
-    )}&selo=&origem=CatalogoPesquisa3`;
-
     try {
-      const response = await fetch(url, {
-        method: "GET",
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+      const resp = await axios.get(`${API_BASE}/bec/product/${encodeURIComponent(cod_id)}`, {
+        headers: token ? { 'access-token': token } : undefined,
       });
-
-      if (!response.ok) {
-        throw new Error("Erro ao obter detalhes do produto.");
-      }
-
-      const data = await response.text();
-      return data;
+      return resp.data?.data || null;
     } catch (error) {
-      console.error(error);
-      return "";
+      console.error('Erro getProductDetails (proxy):', error);
+      return null;
     }
   },
 };

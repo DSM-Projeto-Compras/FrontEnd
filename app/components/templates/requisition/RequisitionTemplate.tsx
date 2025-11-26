@@ -103,50 +103,30 @@ const RequisitionTemplate: React.FC = () => {
     setFieldValue: (field: string, value: any) => void
   ) => {
     try {
-      const html = await SearchBecService.searchProduct(productName);
-
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      const conteudoPesquisa = doc.getElementById(
-        "ContentPlaceHolder1_gvResultadoPesquisa_lbTituloItem_0"
-      );
-
-      if (conteudoPesquisa) {
-        const descricaoInput2 = conteudoPesquisa.innerHTML.split(" ")[0];
-
-        const html2 = await SearchBecService.getProductDetails(descricaoInput2);
-
-        const parser2 = new DOMParser();
-        const doc2 = parser2.parseFromString(html2, "text/html");
-        
-        const grupo = doc2.getElementById("ContentPlaceHolder1_lbGrupoInfo");
-        const classe = doc2.getElementById("ContentPlaceHolder1_lbClasseInfo");
-        const material = doc2.getElementById("ContentPlaceHolder1_lbMaterialInfo");
-        const elemento = doc2.getElementById("ContentPlaceHolder1_lbNElementoDespesaInfo");
-        const natureza = doc2.getElementById("ContentPlaceHolder1_lbNdInfo");
-
-        if (grupo && classe && material && elemento && natureza) {
-          const newProductDetails = {
-            cod_id: descricaoInput2,
-            grupo: grupo.innerHTML.trim(),
-            classe: classe.innerHTML.trim(),
-            material: material.innerHTML.trim(),
-            elemento: elemento.innerHTML.trim(),
-            natureza: natureza.innerHTML.trim().replace(/\r?\n/g, ' '),
-          };
-          setProductDetails(newProductDetails);
-          setFieldValue("tipo", newProductDetails.elemento);
-          setFieldValue("cod_id", newProductDetails.cod_id);
-          setFieldValue("grupo", newProductDetails.grupo);
-          setFieldValue("classe", newProductDetails.classe);
-          setFieldValue("material", newProductDetails.material);
-          setFieldValue("elemento", newProductDetails.elemento);
-          setFieldValue("natureza", newProductDetails.natureza);
-          setIsSuggestionSelected(true);
-        }
+      const details = await SearchBecService.searchAndGetDetails(productName);
+      if (details) {
+        const newProductDetails = {
+          cod_id: details.cod_id,
+          grupo: details.grupo || '',
+          classe: details.classe || '',
+          material: details.material || '',
+          elemento: details.elemento || '',
+          natureza: details.natureza || '',
+        };
+        setProductDetails(newProductDetails);
+        setFieldValue('tipo', newProductDetails.elemento);
+        setFieldValue('cod_id', newProductDetails.cod_id);
+        setFieldValue('grupo', newProductDetails.grupo);
+        setFieldValue('classe', newProductDetails.classe);
+        setFieldValue('material', newProductDetails.material);
+        setFieldValue('elemento', newProductDetails.elemento);
+        setFieldValue('natureza', newProductDetails.natureza);
+        setIsSuggestionSelected(true);
+      } else {
+        console.warn('Detalhes do produto não encontrados via proxy');
       }
     } catch (error) {
-      console.error("Erro ao buscar detalhes do produto:", error);
+      console.error('Erro ao buscar detalhes do produto:', error);
     }
   };
 

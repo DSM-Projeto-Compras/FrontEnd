@@ -7,6 +7,7 @@ import AuthService from "../services/authService";
 interface AuthContextProps {
   isAuthenticated: boolean;
   loading?: boolean;
+  isAdmin: boolean;
   user: any;
   login: (email: string, password: string, remember: boolean) => Promise<void>;
   logout: () => void;
@@ -18,6 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
@@ -31,6 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           const userData = await AuthService.getMe();
           setUser(userData);
           setIsAuthenticated(true);
+          setIsAdmin(userData.cargo === "admin");
         } catch (err) {
           console.error("Erro ao buscar usuário logado:", err);
           localStorage.removeItem("access_token");
@@ -61,9 +64,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const fullUser = await AuthService.getMe();
         setUser(fullUser);
-      } catch(err) {
-        console.error("Erro ao obter dados do usuário (getme): ", err)
-        setUser({ nome: response.nome, email, cargo: response.cargo });
+        setIsAdmin(fullUser.cargo === "admin");
+      } catch {
+        setUser({ email, cargo: response.cargo });
+        setIsAdmin(response.cargo === "admin");
       }
 
       if (response.cargo === "admin") {
@@ -81,12 +85,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("access_token");
     localStorage.removeItem("savedCredentials");
     setIsAuthenticated(false);
-    setUser(null);
-    router.push("/")
+    setIsAdmin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, isAdmin, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
