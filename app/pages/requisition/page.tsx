@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import RequisitionTemplate from "../../components/templates/requisition/RequisitionTemplate";
 import { useAuth } from "../../contexts/AuthContext";
-import ChatbotTemplate from "@/ChatbotTemplate";
+import ChatbotTemplate from "@/app/components/templates/chat-bot/ChatbotTemplate";
 
 const RequisitionPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();

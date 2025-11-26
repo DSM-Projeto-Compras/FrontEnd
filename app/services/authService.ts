@@ -71,17 +71,18 @@ class AuthService {
     }
   }
 
-  async getMe() {
+  async getMe(tokenFromArg?: string) {
     try {
-      const token = localStorage.getItem("access_token");
+      const token = tokenFromArg ?? localStorage.getItem("access_token");
+
       if (!token) throw new Error("Token não encontrado");
 
-      const response = await axios.get(`${apiUrl}/me`,{
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${apiUrl}/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       return response.data;
     } catch (error) {
       console.error("Erro ao obter dados do usuário:", error);
