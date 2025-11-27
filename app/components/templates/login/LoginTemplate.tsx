@@ -19,8 +19,7 @@ const LoginTemplate: React.FC<{
     },
   });
 
-  const { handleSubmit, values, handleChange, handleBlur, errors, touched } =
-    formik;
+  const { handleSubmit, values, handleChange, handleBlur, errors, touched } = formik;
 
   return (
     <>

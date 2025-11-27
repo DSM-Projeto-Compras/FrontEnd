@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ admin = true }) => {
                     onClick={() => navigateTo("requisition")}
                     className="cursor-pointer"
                   >
-                    Cadastrar Produto
+                    Realizar Pedido
                   </a>
                 </li>
                 <li>

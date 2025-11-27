@@ -6,8 +6,14 @@ import AuthService from "../../services/authService";
 import RegisterTemplate from "../../components/templates/register/RegisterTemplate";
 
 const RegisterPage: React.FC = () => {
+  const [showSucessModal, setShowSucessModal] = useState(false);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const router = useRouter();
+
+  const handleModalClose = () => {
+    setShowSucessModal(false);
+    router.push("/");
+  }
 
   const handleRegister = async (
     nome: string,
@@ -15,6 +21,8 @@ const RegisterPage: React.FC = () => {
     senha: string,
     confirmarSenha: string
   ) => {
+    setErrorMessages([]);
+
     if (senha !== confirmarSenha) {
       setErrorMessages(["As senhas não coincidem. Por favor, verifique."]);
       return;
@@ -23,8 +31,7 @@ const RegisterPage: React.FC = () => {
     try {
       await AuthService.register({ nome, email, senha });
 
-      alert("Cadastro realizado com sucesso!");
-      router.push("/");
+      setShowSucessModal(true);
     } catch (error: any) {
       if (
         error.response &&
@@ -47,6 +54,8 @@ const RegisterPage: React.FC = () => {
     <RegisterTemplate
       onRegister={handleRegister}
       errorMessages={errorMessages}
+      showSucessModal={showSucessModal}
+      onSucessModalClose={handleModalClose}
     />
   );
 };

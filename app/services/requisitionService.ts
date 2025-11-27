@@ -19,13 +19,13 @@ interface RequisitionData {
 }
 
 interface EditData {
-  _id: string;
+  id: string;
   quantidade: number;
   descricao: string;
 }
 
 interface EditDataStatus {
-  _id: string;
+  id: string;
   status: string;
   justificativa: string;
 }
@@ -87,6 +87,7 @@ class RequisitionService {
         },
       });
       console.log("Requisição enviada com sucesso");
+      console.log("dados: ", data)
     } catch (error) {
       console.error("Erro ao enviar a requisição:", error);
       throw error;
@@ -134,6 +135,7 @@ class RequisitionService {
       });
       console.log("Produto atualizado com sucesso");
     } catch (error) {
+      console.log("dados recebidos:", data)
       console.error("Erro ao atualizar o produto:", error);
       throw error;
     }
@@ -157,7 +159,7 @@ class RequisitionService {
   async updateProductStatus(data: EditDataStatus): Promise<void> {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.put(`${apiProductUrl}/aprove/${data._id}`, data, {
+      await axios.put(`${apiProductUrl}/aprove/${data.id}`, data, {
         headers: {
           "access-token": token || "",
         },
