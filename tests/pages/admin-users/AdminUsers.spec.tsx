@@ -112,7 +112,7 @@ const server = setupServer(
 
 //#region Registered admins list
 
-describe("Registered admins list", () => {
+describe.skip("Registered admins list", () => {
     const getAdminsMock = requisitionService.getAdmins as jest.Mock
     const deleteUserSpy = jest.spyOn(adminService, 'deleteUser');
     

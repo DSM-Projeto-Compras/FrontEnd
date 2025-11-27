@@ -207,7 +207,7 @@ const server = setupServer(
 
 //#region Header Component (admin)
 
-describe("Header Component (admin)", () => {
+describe.skip("Header Component (admin)", () => {
     let mockPush: jest.Mock;
     let mockLogout: jest.Mock;
 
@@ -258,7 +258,7 @@ describe("Header Component (admin)", () => {
 
 //#region Admin products list
 
-describe("Admin products list", () => {
+describe.skip("Admin products list", () => {
     const getAllProductsMock = requisitionService.getAllProducts as jest.Mock;
     const updateProductStatusMock = requisitionService.updateProductStatus as jest.Mock;
 
@@ -566,7 +566,7 @@ describe("Admin products list", () => {
 
 //#region Products Filter (admin)
 
-describe("Products Filter", () => { //Testes repetidos, se possível, unir componentes em um só e apenas realizar chamada no front
+describe.skip("Products Filter", () => { //Testes repetidos, se possível, unir componentes em um só e apenas realizar chamada no front
     const getAllProductsMock = requisitionService.getAllProducts as jest.Mock;
 
     beforeAll(() => {

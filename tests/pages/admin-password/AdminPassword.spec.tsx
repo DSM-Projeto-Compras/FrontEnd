@@ -121,7 +121,13 @@ describe("Admin Change Password Elements", () => {
 
         await act(async() => fireEvent.click(botaoAlterar) ) 
 
-        expect(screen.getByText(/senha alterada com sucesso!/i)).toBeInTheDocument()
+        screen.logTestingPlaygroundURL()
+
+        expect(await screen.findByText(/senha alterada com sucesso!/i)).toBeInTheDocument();
+        
+        // await waitFor(async () => {
+        //     expect(screen.getByText(/senha alterada com sucesso!/i)).toBeInTheDocument()
+        // })
     })
 
     it("should throw an error for mismatch passwords", async() => {
@@ -149,7 +155,7 @@ describe("Admin Change Password Elements", () => {
 
         await act(async() => fireEvent.click(botaoAlterar) ) 
 
-        expect(screen.getByText(/as senhas não coincidem\./i)).toBeInTheDocument()
+        expect(screen.getByText(/as novas senhas não correspondem/i)).toBeInTheDocument()
     })
 
     it("should throw an error for wrong actual password", async() => {
