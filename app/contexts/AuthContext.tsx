@@ -62,10 +62,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsAuthenticated(true);
 
       try {
-        const fullUser = await AuthService.getMe();
+        const fullUser = await AuthService.getMe(response.access_token);
         setUser(fullUser);
         setIsAdmin(fullUser.cargo === "admin");
-      } catch {
+      } catch (err) {
+        console.warn("getMe falhou com token direto, fallback:", err);
         setUser({ email, cargo: response.cargo });
         setIsAdmin(response.cargo === "admin");
       }
@@ -89,7 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, isAdmin, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, loading, isAdmin, user, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

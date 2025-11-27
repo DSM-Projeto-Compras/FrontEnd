@@ -65,7 +65,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
               Status
             </span>
             <div className="mt-2 space-y-2">
-              {["", "Pendente", "Negado", "Aprovado"].map((status) => (
+              {["", "Pendente", "Aprovado", "Negado", "Realizado", "Entregue", "Finalizado"].map((status) => (
                 <div className="flex items-center" key={status}>
                   <input
                     type="radio"
@@ -81,15 +81,21 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
                     className="ml-3 flex items-center text-sm font-medium text-gray-500"
                   >
                     <span
-                      className={`bg-${
+                      className={`w-3 h-3 me-3 rounded-full ${
                         status === "Aprovado"
-                          ? "green-500"
+                          ? "bg-blue-500"
                           : status === "Pendente"
-                          ? "yellow-500"
+                          ? "bg-yellow-500"
                           : status === "Negado"
-                          ? "red-500"
-                          : "blue-500"
-                      } w-3 h-3 me-3 rounded-full`}
+                          ? "bg-red-500"
+                          : status === "Realizado"
+                          ? "bg-green-500"
+                          : status === "Entregue"
+                          ? "bg-purple-500"
+                          : status === "Finalizado"
+                          ? "bg-indigo-500"
+                          : "bg-gray-500"
+                      }`}
                     ></span>
                     {status || "Todos"}
                   </label>
