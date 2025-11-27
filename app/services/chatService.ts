@@ -6,7 +6,7 @@ class ChatService {
   private baseUrl: string;
 
   constructor() {
-    // garante que não teremos "//" duplo
+    // garante que não teremos "//" duplo 
     this.baseUrl = BASE.replace(/\/+$/, "");
   }
 
