@@ -2,7 +2,7 @@ import React from "react";
 import { useFormik } from "formik";
 import { registerValidationSchema } from "../../../../app/validators/registerValidation";
 import Header from "../../molecules/HeaderLogin";
-import SuccessModal from "../../organisms/SucessModal";
+import SuccessModal from "../../organisms/SuccessModal";
 
 const RegisterTemplate: React.FC<{
   onRegister: (
