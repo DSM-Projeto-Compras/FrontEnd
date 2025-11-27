@@ -10,7 +10,10 @@ export const supplierValidationSchema = Yup.object({
     .min(2, "Nome deve ter no mínimo 2 caracteres"),
   cnpj: Yup.string()
     .required("CNPJ é obrigatório")
-    .matches(cnpjRegex, "CNPJ inválido. Use o formato 00.000.000/0000-00 ou 14 dígitos"),
+    .matches(
+      cnpjRegex,
+      "CNPJ inválido. Use o formato 00.000.000/0000-00 ou 14 dígitos"
+    ),
   cep: Yup.string()
     .optional()
     .matches(cepRegex, "CEP inválido. Use o formato 00000-000"),
@@ -20,9 +23,7 @@ export const supplierValidationSchema = Yup.object({
     .optional()
     .max(2, "Estado deve ter no máximo 2 caracteres"),
   numero: Yup.string().optional(),
-  email: Yup.string()
-    .optional()
-    .email("Email inválido"),
+  email: Yup.string().optional().email("Email inválido"),
   telefone: Yup.string()
     .optional()
     .matches(telefoneRegex, "Telefone inválido. Use o formato (00) 00000-0000"),
