@@ -241,6 +241,8 @@ describe("Header Component (admin)", () => {
         
         const abaHistorico = screen.getByText(/histórico/i)
         const abaAdmins = screen.getByText(/administradores/i)
+        const abaFornecedores = screen.getByText(/fornecedores/i)
+        const abaPedidos = screen.getByText(/pedidos/i)
 
         const menu = screen.getByText(/menu/i)
         if(menu){
@@ -253,6 +255,12 @@ describe("Header Component (admin)", () => {
         
         fireEvent.click(await abaAdmins);
         expect(mockPush).toHaveBeenCalledWith('admin-users')
+
+        fireEvent.click(await abaFornecedores);
+        expect(mockPush).toHaveBeenCalledWith('admin-suppliers')
+
+        fireEvent.click(await abaPedidos);
+        expect(mockPush).toHaveBeenCalledWith('admin-orders')
     })
 })
 
