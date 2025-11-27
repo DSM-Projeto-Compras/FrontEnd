@@ -51,12 +51,12 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-      <RegisterTemplate
-        onRegister={handleRegister}
-        errorMessages={errorMessages}
-        showSucessModal={showSucessModal}
-        onSucessModalClose={handleModalClose}
-      />
+    <RegisterTemplate
+      onRegister={handleRegister}
+      errorMessages={errorMessages}
+      showSucessModal={showSucessModal}
+      onSucessModalClose={handleModalClose}
+    />
   );
 };
 

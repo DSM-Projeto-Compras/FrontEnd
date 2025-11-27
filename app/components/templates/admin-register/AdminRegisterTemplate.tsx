@@ -3,7 +3,7 @@
 import { registerValidationSchema } from "../../../../app/validators/registerValidation";
 import Header from "../../organisms/Header"
 import { useFormik } from "formik";
-import SuccessModal from "../../organisms/SuccessModal";
+import SuccessModal from "../../organisms/SucessModal";
 
 
 const AdminRegisterTemplate: React.FC<{

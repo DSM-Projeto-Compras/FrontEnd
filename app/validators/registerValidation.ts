@@ -1,17 +1,15 @@
 import * as Yup from "yup";
 
 export const registerValidationSchema = Yup.object().shape({
-  name: Yup.string().required("O nome é obrigatório").matches(
-    /^[a-zA-ZÀ-ÿ\s]+$/,
-    "O nome só pode conter letras e espaços"
-  ).min(2, "O nome deve ter pelo menos 2 caracteres").max(80, "O nome deve manter no máximo 80 caracteres"),
+  name: Yup.string()
+    .required("O nome é obrigatório")
+    .matches(/^[a-zA-ZÀ-ÿ\s]+$/, "O nome só pode conter letras e espaços")
+    .min(2, "O nome deve ter pelo menos 2 caracteres")
+    .max(80, "O nome deve manter no máximo 80 caracteres"),
 
   email: Yup.string()
     .email("O email informado não é válido")
-    .matches(
-      /@fatec\.sp\.gov\.br$/,
-      "Apenas emails institucionais da Fatec (@fatec.sp.gov.br) são permitidos"
-    )
+    .matches(/@fatec\.sp\.gov\.br$/, "Apenas emails institucionais da Fatec")
     .required("O email é obrigatório")
     .min(17, "O email deve ter pelo menos 17 caracteres"),
 

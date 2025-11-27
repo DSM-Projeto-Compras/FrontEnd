@@ -77,12 +77,13 @@ class AuthService {
 
       if (!token) throw new Error("Token não encontrado");
 
-      const response = await axios.get(`${apiUrl}/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const response = await axios.get(`${apiUrl}/me`,{
+          headers: {
+            // Authorization: `Bearer ${token}`,
+            "access-token": token,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Erro ao obter dados do usuário:", error);

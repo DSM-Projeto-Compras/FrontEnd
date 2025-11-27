@@ -104,7 +104,7 @@ const AdminDashboardTemplate: React.FC = () => {
     if (selectedProductId) {
       try {
         await RequisitonService.updateProductStatus({
-          _id: selectedProductId,
+          id: selectedProductId,
           status: "Negado",
           justificativa: justification, // Justificativa opcional
         });
@@ -200,7 +200,7 @@ const AdminDashboardTemplate: React.FC = () => {
     setActiveProductMenu(null);
     try {
       await RequisitonService.updateProductStatus({
-        _id: id,
+        id: id,
         status: "Aprovado", // Status aprovado
         justificativa: "", // Justificativa vazia
       });
@@ -276,8 +276,6 @@ const AdminDashboardTemplate: React.FC = () => {
         return "bg-yellow-500";
       case "Negado":
         return "bg-red-500";
-      default:
-        return "bg-gray-500";
     }
   };
 

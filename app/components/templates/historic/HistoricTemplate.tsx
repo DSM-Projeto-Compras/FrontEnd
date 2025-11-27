@@ -175,7 +175,7 @@ const HistoricTemplate: React.FC = () => {
         // Chama o service para atualizar o produto
         console.log(editingProduct.id);
         await RequisitonService.updateProduct({
-          _id: editingProduct.id,
+          id: editingProduct.id,
           descricao: editDescription,
           quantidade: editQuantity,
         });
@@ -378,8 +378,9 @@ const HistoricTemplate: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {currentProducts.map((product) => (
-                <tr key={product.id} className="bg-white border-b">
+              {currentProducts.map((product, index) => (
+
+                <tr key={product.id ?? index} className="bg-white border-b">
                   <td className="px-6 py-4">
                     {isTextTooLong(product.name) ? (
                       <span className="flex font-medium">
@@ -545,7 +546,7 @@ const HistoricTemplate: React.FC = () => {
       </div>
 
       {isEditModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
           <div className="bg-white p-6 rounded-lg w-[600px]">
             {" "}
             {/* Largura fixa de 500px */}
@@ -591,7 +592,7 @@ const HistoricTemplate: React.FC = () => {
       )}
 
       {isDetailModalOpen && viewingProduct && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
           <div className="bg-white p-6 rounded-lg w-[600px]">
             {/* Largura fixa de 600px */}
             <h2 className="text-xl font-bold mb-4">Detalhes do Produto</h2>
