@@ -169,6 +169,81 @@ class RequisitionService {
     }
   }
 
+  async markAsRealized(productId: string, supplierId: string): Promise<void> {
+    try {
+      const token = localStorage.getItem("access_token");
+      await axios.put(
+        `${apiProductUrl}/${productId}/mark-realized`,
+        { supplierId },
+        {
+          headers: {
+            "access-token": token || "",
+          },
+        }
+      );
+      console.log("Produto marcado como Realizado com sucesso");
+    } catch (error) {
+      console.error("Erro ao marcar produto como Realizado:", error);
+      throw error;
+    }
+  }
+
+  async markAsDelivered(productId: string): Promise<void> {
+    try {
+      const token = localStorage.getItem("access_token");
+      await axios.put(
+        `${apiProductUrl}/${productId}/mark-delivered`,
+        {},
+        {
+          headers: {
+            "access-token": token || "",
+          },
+        }
+      );
+      console.log("Produto marcado como Entregue com sucesso");
+    } catch (error) {
+      console.error("Erro ao marcar produto como Entregue:", error);
+      throw error;
+    }
+  }
+
+  async markAsFinalized(productId: string): Promise<void> {
+    try {
+      const token = localStorage.getItem("access_token");
+      await axios.put(
+        `${apiProductUrl}/${productId}/mark-finalized`,
+        {},
+        {
+          headers: {
+            "access-token": token || "",
+          },
+        }
+      );
+      console.log("Produto marcado como Finalizado com sucesso");
+    } catch (error) {
+      console.error("Erro ao marcar produto como Finalizado:", error);
+      throw error;
+    }
+  }
+
+  async revertProductStatus(productId: string): Promise<void> {
+    try {
+      const token = localStorage.getItem("access_token");
+      await axios.put(
+        `${apiProductUrl}/${productId}/revert-status`,
+        {},
+        {
+          headers: {
+            "access-token": token || "",
+          },
+        }
+      );
+      console.log("Status do produto revertido com sucesso");
+    } catch (error) {
+      console.error("Erro ao reverter status do produto:", error);
+      throw error;
+    }
+  }
 
   // Users
   async getAdmins(): Promise<RequisitedUserData[]> {

@@ -32,12 +32,14 @@ class SupplierService {
   async createSupplier(data: SupplierData): Promise<void> {
     try {
       const token = localStorage.getItem("access_token");
-      
+
       // Remove campos vazios ou apenas com espaços
       const cleanData = Object.fromEntries(
-        Object.entries(data).filter(([_, value]) => value && value.trim() !== "")
+        Object.entries(data).filter(
+          ([_, value]) => value && value.trim() !== ""
+        )
       );
-      
+
       await axios.post(apiSupplierUrl, cleanData, {
         headers: {
           "access-token": token || "",
@@ -83,12 +85,14 @@ class SupplierService {
   async updateSupplier(id: string, data: SupplierData): Promise<void> {
     try {
       const token = localStorage.getItem("access_token");
-      
+
       // Remove campos vazios ou apenas com espaços
       const cleanData = Object.fromEntries(
-        Object.entries(data).filter(([_, value]) => value && value.trim() !== "")
+        Object.entries(data).filter(
+          ([_, value]) => value && value.trim() !== ""
+        )
       );
-      
+
       await axios.put(`${apiSupplierUrl}/${id}`, cleanData, {
         headers: {
           "access-token": token || "",
@@ -122,11 +126,11 @@ class SupplierService {
       const response = await axios.get(
         `https://viacep.com.br/ws/${cleanCep}/json/`
       );
-      
+
       if (response.data.erro) {
         throw new Error("CEP não encontrado");
       }
-      
+
       return response.data;
     } catch (error) {
       console.error("Erro ao buscar endereço pelo CEP:", error);

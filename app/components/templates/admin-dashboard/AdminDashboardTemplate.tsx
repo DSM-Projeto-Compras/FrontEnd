@@ -271,11 +271,17 @@ const AdminDashboardTemplate: React.FC = () => {
   const renderStatusDot = (status: string) => {
     switch (status) {
       case "Aprovado":
-        return "bg-green-500";
+        return "bg-blue-500";
       case "Pendente":
         return "bg-yellow-500";
       case "Negado":
         return "bg-red-500";
+      case "Realizado":
+        return "bg-green-500";
+      case "Entregue":
+        return "bg-purple-500";
+      case "Finalizado":
+        return "bg-indigo-500";
       default:
         return "bg-gray-500";
     }

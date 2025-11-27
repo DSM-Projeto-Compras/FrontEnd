@@ -48,30 +48,38 @@ const Header: React.FC<HeaderProps> = ({ admin = true }) => {
             )}
             {admin && (
               <>
-              <li>
-                <a
-                  onClick={() => navigateTo("admin-dashboard")}
-                  className="cursor-pointer"
-                >
-                  Histórico
-                </a>
-              </li>
-              <li>
-                <a
-                  onClick={() => navigateTo("admin-suppliers")}
-                  className="cursor-pointer"
-                >
-                  Fornecedores
-                </a>
-              </li>
-              <li>
-                <a
-                  onClick={() => navigateTo("admin-users")}
-                  className="cursor-pointer"
-                >
-                  Administradores  
-                </a>  
-              </li>             
+                <li>
+                  <a
+                    onClick={() => navigateTo("admin-dashboard")}
+                    className="cursor-pointer"
+                  >
+                    Histórico
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => navigateTo("admin-orders")}
+                    className="cursor-pointer"
+                  >
+                    Pedidos
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => navigateTo("admin-suppliers")}
+                    className="cursor-pointer"
+                  >
+                    Fornecedores
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => navigateTo("admin-users")}
+                    className="cursor-pointer"
+                  >
+                    Administradores
+                  </a>
+                </li>
               </>
             )}
             <li>
