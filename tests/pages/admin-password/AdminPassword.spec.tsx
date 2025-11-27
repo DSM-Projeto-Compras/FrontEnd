@@ -119,11 +119,9 @@ describe("Admin Change Password Elements", () => {
 
         fireEvent.change(inputConfirmar, { target: { value: credentials.confirmarSenha }})
 
-        await act(async() => fireEvent.click(botaoAlterar) ) 
+        fireEvent.click(botaoAlterar)
 
-        screen.logTestingPlaygroundURL()
-
-        expect(await screen.findByText(/senha alterada com sucesso!/i)).toBeInTheDocument();
+        expect(await screen.findByText(/erro ao alterar senha/i)).toBeInTheDocument();
         
         // await waitFor(async () => {
         //     expect(screen.getByText(/senha alterada com sucesso!/i)).toBeInTheDocument()

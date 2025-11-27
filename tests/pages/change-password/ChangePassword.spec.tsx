@@ -5,7 +5,7 @@ import AuthService from "../../../app/services/authService";
 
 jest.mock("../../../app/services/authService");
 
-describe.skip("Change Password Page Elements", () => {
+describe("Change Password Page Elements", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });

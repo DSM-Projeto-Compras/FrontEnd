@@ -194,7 +194,7 @@ describe("Requisition Page", () => {
         const inputQtd = screen.getByRole('spinbutton', {name: /quantidade\*/i})
         const comboCategoria = screen.getByRole('combobox', {name: /categoria\*/i})
         const inputDescricao = screen.getByRole('textbox', {name: /descrição/i})
-        const btnEnviar = screen.getByRole('button', {name: /enviar/i})
+        const btnEnviar = screen.getByRole('button', {name: /requisitar/i})
 
         await act(async () => {
             fireEvent.change(input, { target: { value: "caneta" } });
@@ -230,7 +230,7 @@ describe("Requisition Page", () => {
     it("should display validators on empty inputs", async () => {
         await act(() => {render(<RequisitionPage />)})
 
-        const btnEnviar = screen.getByRole('button', {name: /enviar/i})
+        const btnEnviar = screen.getByRole('button', {name: /requisitar/i})
 
         await act(async() => fireEvent.click(btnEnviar))
 
@@ -258,7 +258,7 @@ describe("Requisition Page", () => {
         const inputQtd = screen.getByRole('spinbutton', {name: /quantidade\*/i})
         const comboCategoria = screen.getByRole('combobox', {name: /categoria\*/i})
         const inputDescricao = screen.getByRole('textbox', {name: /descrição/i})
-        const btnEnviar = screen.getByRole('button', {name: /enviar/i})
+        const btnEnviar = screen.getByRole('button', {name: /requisitar/i})
 
         // Type produto sem clicar em uma sugestão
         await act(async () => {

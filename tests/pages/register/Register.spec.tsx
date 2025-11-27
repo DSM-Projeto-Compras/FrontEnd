@@ -67,7 +67,7 @@ const server = setupServer(
 
 //#region Register Page Elements 
 
-describe.skip("Register Page Elements", () => {
+describe("Register Page Elements", () => {
     beforeAll(() => {
         server.listen();
     });

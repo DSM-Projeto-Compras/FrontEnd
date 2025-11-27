@@ -143,7 +143,7 @@ const server = setupServer(
 
 //#region describe Header Component
 
-describe.skip("Header Component", () => {
+describe("Header Component", () => {
     //obs: aqui está sendo testado o Header, mas levando em consideração que está com uma estrutura única para a página de Histórico
     let mockPush: jest.Mock;
     let mockLogout: jest.Mock;
@@ -188,7 +188,7 @@ describe.skip("Header Component", () => {
             name: /logo cps/i
         })
 
-        const abaProdutos = screen.getByText(/cadastrar produto/i);
+        const abaProdutos = screen.getByText(/realizar pedido/i);
         const abaHistorico = screen.getByText(/histórico/i);
 
         fireEvent.click(await abaProdutos);
@@ -202,7 +202,7 @@ describe.skip("Header Component", () => {
 //#endregion describe Header Component
 //#region describe Products List
 
-describe.skip("Products List", () => {
+describe("Products List", () => {
     const getProductsMock = requisitionService.getProducts as jest.Mock;
     const updateProductMock = requisitionService.updateProduct as jest.Mock;
     const deleteProductMock = requisitionService.deleteProduct as jest.Mock;
@@ -428,7 +428,7 @@ describe.skip("Products List", () => {
 //#region Describe products filter
 
 
-describe.skip("Products Filter", () => {
+describe("Products Filter", () => {
     const getProductsMock = requisitionService.getProducts as jest.Mock;
 
     beforeAll(() => {
