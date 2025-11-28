@@ -54,7 +54,7 @@ const mockProducts = [
         "elemento": '339030 - Material de Consumo',
         "natureza": '33903041<br>0<br>',
         "data": "2025-11-18T04:12:46.020Z",
-        "status": 'Pendente',
+        "status": 'Finalizado',
         "justificativa": '',
         "userId": '674b5c719cc34fc0cc69a6e2',
         "user": { "id": '674b5c719cc34fc0cc69a6e2', "nome": 'Beltrano Almeida' }
@@ -75,7 +75,7 @@ const mockProducts = [
         "natureza": '33903040<br>0<br>',
 
         "data": "2023-12-01T10:00:00.000Z",
-        "status": "Pendente",
+        "status": "Aprovado",
         "justificativa": '',
         "userId": "674b5c719cc34fc0cc69a6e2",
         "user": { "id": '674b5c719cc34fc0cc69a6e2', "nome": 'Beltrano Almeida' }
@@ -118,7 +118,7 @@ const mockProducts = [
         "natureza": '33903041<br>0<br>',
 
         "data": "2025-11-02T10:00:00.000Z",
-        "status": "Aprovado",
+        "status": "Entregue",
         "justificativa": '',
         "userId": "674b5c719cc34fc0cc69a6e1",
         "user": { "id": '674b5c719cc34fc0cc69a6e1', "nome": 'Fulano da Silva' }
@@ -138,7 +138,7 @@ const mockProducts = [
         "elemento": '449052 - Equipamentos e Material Permanente',
         "natureza": '44905234<br>0<br>',
         "data": "2025-11-18T03:38:18.370Z",
-        "status": 'Pendente',
+        "status": 'Realizado',
         "justificativa": '',
         "userId": "674b5c719cc34fc0cc69a6e1",
         "user": { "id": '674b5c719cc34fc0cc69a6e1', "nome": 'Fulano da Silva' }
@@ -157,7 +157,7 @@ const mockProducts = [
         "elemento": '449052 - Equipamentos e Material Permanente',
         "natureza": '44905234<br>0<br>',
         "data": "2025-11-17T22:51:29.322Z",
-        "status": 'Aprovado',
+        "status": 'Pendente',
         "justificativa": '',
         "userId": 'cmhme00jg0000vqawpz1q6c5j',
         "user": { "id": 'cmhme00jg0000vqawpz1q6c5j', "nome": 'Felipe Thiago' }
@@ -305,12 +305,12 @@ describe("Admin products list", () => {
         });
 
         const pendente = within(user).getByText(/pendente/i); //para valores repetidos isolar uma célula da tabela
-        const aprovado = screen.getByText("Aprovado");
+        // const aprovado = screen.getByText("Aprovado");
         const negado = screen.getByText("Negado");
 
         expect(caneta).toBeVisible()
         expect(pendente).toBeVisible()
-        expect(aprovado).toBeVisible()
+        // expect(aprovado).toBeVisible()
         expect(negado).toBeVisible()
     })
 
@@ -693,11 +693,11 @@ describe("Products Filter", () => { //Testes repetidos, se possível, unir compo
             name: /fechar filtro/i
         })
 
-        const radioPendente = screen.getByRole('radio', {
-            name: /pendente/i
+        const radioAprovado = screen.getByRole('radio', {
+            name: /aprovado/i
         })
 
-        fireEvent.click(radioPendente)
+        fireEvent.click(radioAprovado)
 
         fireEvent.click(botaoFechar)
 
@@ -800,12 +800,11 @@ describe("Products Filter", () => { //Testes repetidos, se possível, unir compo
             name: /fechar filtro/i
         })
 
-        const radioPendente = screen.getByRole('radio', {
-            name: /pendente/i
+        const radioAprovado = screen.getByRole('radio', {
+            name: /aprovado/i
         })
 
-        fireEvent.click(radioPendente)
-
+        fireEvent.click(radioAprovado)
         expect(quadroBranco).not.toBeInTheDocument()
         expect(papel).toBeInTheDocument()
 

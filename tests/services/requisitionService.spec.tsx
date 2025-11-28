@@ -83,7 +83,7 @@ afterAll(() => server.close());
 // TESTES
 //
 
-describe.skip("RequisitionService.getProducts", () => {
+describe("RequisitionService.getProducts", () => {
   it("should return product list", async () => {
     const data = await requisitionService.getProducts();
     expect(data.length).toBe(2);
@@ -97,7 +97,7 @@ describe.skip("RequisitionService.getProducts", () => {
   });
 });
 
-describe.skip("RequisitionService.getAllProducts", () => {
+describe("RequisitionService.getAllProducts", () => {
   it("should return admin list", async () => {
     const data = await requisitionService.getAllProducts();
     expect(data[0].user.nome).toBe("Admin");
@@ -110,7 +110,7 @@ describe.skip("RequisitionService.getAllProducts", () => {
   });
 });
 
-describe.skip("RequisitionService.sendRequisition", () => {
+describe("RequisitionService.sendRequisition", () => {
   it("should send a requisition successfully", async () => {
     await expect(
       requisitionService.sendRequisition({
@@ -136,7 +136,7 @@ describe.skip("RequisitionService.sendRequisition", () => {
   });
 });
 
-describe.skip("RequisitionService.updateProduct", () => {
+describe("RequisitionService.updateProduct", () => {
   it("should update product", async () => {
     await expect(
       requisitionService.updateProduct({
@@ -160,7 +160,7 @@ describe.skip("RequisitionService.updateProduct", () => {
   });
 });
 
-describe.skip("RequisitionService.updateProductStatus", () => {
+describe("RequisitionService.updateProductStatus", () => {
   it("should approve status", async () => {
     await expect(
       requisitionService.updateProductStatus({
@@ -186,7 +186,7 @@ describe.skip("RequisitionService.updateProductStatus", () => {
   });
 });
 
-describe.skip("RequisitionService.deleteProduct", () => {
+describe("RequisitionService.deleteProduct", () => {
   it("should delete a product", async () => {
     await expect(requisitionService.deleteProduct("1")).resolves.not.toThrow();
   });
@@ -198,7 +198,7 @@ describe.skip("RequisitionService.deleteProduct", () => {
   });
 });
 
-describe.skip("RequisitionService.getAdmins", () => {
+describe("RequisitionService.getAdmins", () => {
   it("should return admin list", async () => {
     const data = await requisitionService.getAdmins();
     expect(data[0].email).toBe("admin@fatec.sp.gov.br");
@@ -211,7 +211,7 @@ describe.skip("RequisitionService.getAdmins", () => {
   });
 });
 
-describe.skip("RequisitionService – token falsy branch", () => {
+describe("RequisitionService – token falsy branch", () => {
   beforeEach(() => {
     // Força token = null → cobre o branch do OR
     global.localStorage.getItem = jest.fn(() => null);
