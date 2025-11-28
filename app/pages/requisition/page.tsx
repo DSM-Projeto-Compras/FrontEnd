@@ -12,7 +12,7 @@ const RequisitionPage: React.FC = () => {
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push("login");
+      router.push("/pages/login");
     }
   }, [isAuthenticated, loading, router]);
 

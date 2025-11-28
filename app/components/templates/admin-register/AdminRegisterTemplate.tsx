@@ -13,10 +13,9 @@ const AdminRegisterTemplate: React.FC<{
         password: string,
         confirmPassword: string
     ) => void;
-    errorMessages?: string[];
     showSucessModal: boolean;
     onSucessModalClose: () => void;
-}> = ({ onRegister, errorMessages = [], showSucessModal, onSucessModalClose  }) => {
+}> = ({ onRegister, showSucessModal, onSucessModalClose  }) => {
     const formik = useFormik({
         initialValues: {
             name: "",
@@ -44,14 +43,6 @@ const AdminRegisterTemplate: React.FC<{
                                     onSubmit={formik.handleSubmit}
                                     className="space-y-4 md:space-y-6"
                                 >
-                                    {errorMessages.length > 0 && (
-                                        <div className="text-red-500 text-sm mb-2">
-                                            {errorMessages.map((message, index) => (
-                                                <p key={index}>{message}</p>
-                                            ))}
-                                        </div>
-                                    )}
-
                                     <div> { /* Campo Nome */}
                                         <label htmlFor="name" className="block text-sm font-medium">Nome</label>
                                         <input

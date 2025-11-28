@@ -72,9 +72,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (response.cargo === "admin") {
-        router.push("admin-dashboard");
+        router.push("/pages/admin-dashboard");
       } else {
-        router.push("requisition");
+        router.push("/pages/requisition");
       }
     } catch (error) {
       console.error("Erro ao fazer login", error);

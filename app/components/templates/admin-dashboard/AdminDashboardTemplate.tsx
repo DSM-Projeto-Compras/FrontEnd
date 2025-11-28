@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Header from "../../organisms/Header";
 import FilterMenu, { FilterValues } from "../../organisms/Filter";
 import RequisitonService from "../../../services/requisitionService";
+import { toast } from "react-toastify";
 
 interface Product {
   id: string;
@@ -115,9 +116,11 @@ const AdminDashboardTemplate: React.FC = () => {
         );
         setAllProducts(updatedProducts);
         setFilteredProducts(updatedProducts);
+        toast.success("Produto negado com sucesso!");
         closeConfirmModal();
       } catch (error) {
         console.error("Erro ao negar produto:", error);
+        toast.error("Erro ao negar produto. Tente novamente.");
       }
     }
   };
@@ -210,8 +213,10 @@ const AdminDashboardTemplate: React.FC = () => {
       );
       setAllProducts(updatedProducts);
       setFilteredProducts(updatedProducts); // Atualizar os produtos filtrados também
+      toast.success("Produto aprovado com sucesso!");
     } catch (error) {
       console.error("Erro ao aprovar produto:", error);
+      toast.error("Erro ao aprovar produto. Tente novamente.");
     }
   };
 

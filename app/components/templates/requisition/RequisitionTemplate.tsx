@@ -11,6 +11,7 @@ import RequisitionService from "../../../services/requisitionService"
 import SearchBecService from "../../../services/searchBecService";
 
 import Header from "../../organisms/Header";
+import { toast } from "react-toastify";
 
 interface RequisitionFormValues {
   nome: string;
@@ -40,8 +41,6 @@ const RequisitionTemplate: React.FC = () => {
     natureza: string;
   } | null>(null);
 
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuggestionSelected, setIsSuggestionSelected] =
     useState<boolean>(false);
 
@@ -53,21 +52,21 @@ const RequisitionTemplate: React.FC = () => {
     descricao: "",
   };
 
-  const handleSubmit = async (values: any) => {
-    setSuccessMessage(null);
-    setErrorMessage(null);
-
+  const handleSubmit = async (values: any, { resetForm }: any) => {
     // Checa se uma sugestão foi selecionada
     if (!isSuggestionSelected) {
-      setErrorMessage("Por favor, selecione uma sugestão de produto.");
+      toast.warning("Por favor, selecione uma sugestão de produto.");
       return;
     }
 
     try {
       await RequisitionService.sendRequisition(values);
-      setSuccessMessage("Produto solicitado com sucesso!");
+      toast.success("Produto solicitado com sucesso!");
+      resetForm();
+      setProductDetails(null);
+      setIsSuggestionSelected(false);
     } catch (error) {
-      setErrorMessage("Erro ao enviar a requisição.");
+      toast.error("Erro ao enviar a requisição.");
       console.error("Erro na requisição:", error)
     }
   };
@@ -277,18 +276,6 @@ const RequisitionTemplate: React.FC = () => {
               </div>
               <div className="flex items-center justify-center sm:place-items-start sm:justify-normal">
                 <Button type="submit">Enviar</Button>
-
-                {errorMessage && (
-                  <div className="flex flex-col w-full items-center px-5 py-2.5 ml-5 mt-4 border-red-200 border bg-red-100 rounded-xl text-sm">
-                    <p>{errorMessage}</p>
-                  </div>
-                )}
-
-                {successMessage && (
-                  <div className="flex flex-col w-full items-center px-5 py-2.5 ml-5 mt-4 border-green-200 border bg-green-100 rounded-xl text-sm">
-                    <p>{successMessage}</p>
-                  </div>
-                )}
               </div>
             </Form>
           )}

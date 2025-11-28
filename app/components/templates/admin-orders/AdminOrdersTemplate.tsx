@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Header from "../../organisms/Header";
 import requisitionService from "@/app/services/requisitionService";
 import supplierService from "@/app/services/supplierService";
+import { toast } from "react-toastify";
 
 interface Product {
   id: string;
@@ -84,7 +85,7 @@ export default function AdminOrdersTemplate() {
           ? (error as { response?: { data?: { message?: string } } }).response
               ?.data?.message
           : undefined;
-      alert(
+      toast.error(
         errorMessage || "Erro ao carregar dados. Tente novamente mais tarde."
       );
     } finally {
@@ -94,7 +95,7 @@ export default function AdminOrdersTemplate() {
 
   const handleMarkAsRealized = async () => {
     if (!selectedProduct || !selectedSupplier) {
-      alert("Selecione um fornecedor para continuar.");
+      toast.warning("Selecione um fornecedor para continuar.");
       return;
     }
 
@@ -103,7 +104,7 @@ export default function AdminOrdersTemplate() {
         selectedProduct.id,
         selectedSupplier
       );
-      alert("Pedido marcado como Realizado.");
+      toast.success("Pedido marcado como Realizado.");
       setShowSupplierModal(false);
       setSelectedProduct(null);
       setSelectedSupplier("");
@@ -114,7 +115,9 @@ export default function AdminOrdersTemplate() {
           ? (error as { response?: { data?: { message?: string } } }).response
               ?.data?.message
           : undefined;
-      alert(errorMessage || "Erro ao marcar como Realizado. Tente novamente.");
+      toast.error(
+        errorMessage || "Erro ao marcar como Realizado. Tente novamente."
+      );
     }
   };
 
@@ -122,7 +125,7 @@ export default function AdminOrdersTemplate() {
     setActiveProductMenu(null);
     try {
       await requisitionService.markAsDelivered(product.id);
-      alert("Pedido marcado como Entregue.");
+      toast.success("Pedido marcado como Entregue.");
       await loadData();
     } catch (error: unknown) {
       const errorMessage =
@@ -130,7 +133,9 @@ export default function AdminOrdersTemplate() {
           ? (error as { response?: { data?: { message?: string } } }).response
               ?.data?.message
           : undefined;
-      alert(errorMessage || "Erro ao marcar como Entregue. Tente novamente.");
+      toast.error(
+        errorMessage || "Erro ao marcar como Entregue. Tente novamente."
+      );
     }
   };
 
@@ -138,7 +143,7 @@ export default function AdminOrdersTemplate() {
     setActiveProductMenu(null);
     try {
       await requisitionService.markAsFinalized(product.id);
-      alert("Pedido marcado como Finalizado.");
+      toast.success("Pedido marcado como Finalizado.");
       await loadData();
     } catch (error: unknown) {
       const errorMessage =
@@ -146,7 +151,9 @@ export default function AdminOrdersTemplate() {
           ? (error as { response?: { data?: { message?: string } } }).response
               ?.data?.message
           : undefined;
-      alert(errorMessage || "Erro ao marcar como Finalizado. Tente novamente.");
+      toast.error(
+        errorMessage || "Erro ao marcar como Finalizado. Tente novamente."
+      );
     }
   };
 
@@ -154,7 +161,7 @@ export default function AdminOrdersTemplate() {
     setActiveProductMenu(null);
     try {
       await requisitionService.revertProductStatus(product.id);
-      alert("Status revertido com sucesso.");
+      toast.success("Status revertido com sucesso.");
       await loadData();
     } catch (error: unknown) {
       const errorMessage =
@@ -162,7 +169,7 @@ export default function AdminOrdersTemplate() {
           ? (error as { response?: { data?: { message?: string } } }).response
               ?.data?.message
           : undefined;
-      alert(errorMessage || "Erro ao reverter status. Tente novamente.");
+      toast.error(errorMessage || "Erro ao reverter status. Tente novamente.");
     }
   };
 

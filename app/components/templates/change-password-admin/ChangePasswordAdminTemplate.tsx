@@ -5,12 +5,10 @@ import Header from "../../organisms/Header";
 
 interface ChangePasswordAdminTemplateProps {
   onSubmit: (currentPassword: string, newPassword: string, confirmNewPassword: string) => Promise<boolean>;
-  mensagem: string;
 }
 
 const ChangePasswordAdminTemplate = ({ 
-    onSubmit,
-    mensagem
+    onSubmit
   }: ChangePasswordAdminTemplateProps) => {
 
   const formik = useFormik({
@@ -94,11 +92,6 @@ const ChangePasswordAdminTemplate = ({
                                         )}
                                     </div>
                                     <button type="submit" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Alterar senha</button>
-                                     {mensagem && (
-                                        <p className="text-center text-sm mt-2 text-gray-700">
-                                        {mensagem}
-                                        </p>
-                                    )}
                                 </form>
                             </div>
                         </div>

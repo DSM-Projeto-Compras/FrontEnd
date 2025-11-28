@@ -54,6 +54,7 @@ export default function ChatbotTemplate() {
       };
 
       setMessages(prev => [...prev, botMessage]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       const errorMessage: Message = {
         type: "bot",
