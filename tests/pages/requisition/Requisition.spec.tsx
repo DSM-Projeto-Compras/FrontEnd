@@ -20,6 +20,7 @@ jest.mock("../../../app/services/searchBecService", () => ({
     getProducts: jest.fn(),
     searchProduct: jest.fn(),
     getProductDetails: jest.fn(),
+    searchAndGetDetails: jest.fn(),
 }));
 
 
@@ -33,7 +34,6 @@ import '@testing-library/jest-dom'
 import Router from 'next/router'
 import { setupServer } from "msw/node";
 import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
-import mockRouter from "next-router-mock";
 import RequisitionPage from "../../../app/pages/requisition/page";
 import { useAuth } from "../../../app/contexts/AuthContext";
 import SearchBecService from "../../../app/services/searchBecService";
@@ -83,21 +83,15 @@ describe("Requisition Page", () => {
             d: ["Caneta Azul", "Caneta Preta", "Caneta Vermelha"],
         });
 
-        // Mock da busca de código BEC
-        (SearchBecService.searchProduct as jest.Mock).mockResolvedValue(`
-            <div id="ContentPlaceHolder1_gvResultadoPesquisa_lbTituloItem_0">
-                ABC123 Produto Teste
-            </div>
-        `);
-
-        // Mock dos detalhes do produto BEC
-        (SearchBecService.getProductDetails as jest.Mock).mockResolvedValue(`
-            <span id="ContentPlaceHolder1_lbGrupoInfo">Grupo Teste</span>
-            <span id="ContentPlaceHolder1_lbClasseInfo">Classe Teste</span>
-            <span id="ContentPlaceHolder1_lbMaterialInfo">Material Teste</span>
-            <span id="ContentPlaceHolder1_lbNElementoDespesaInfo">Elemento 123</span>
-            <span id="ContentPlaceHolder1_lbNdInfo">Natureza Teste</span>
-        `);
+        // Mock da busca e obtenção de detalhes via proxy (novo método)
+        (SearchBecService.searchAndGetDetails as jest.Mock).mockResolvedValue({
+            cod_id: "ABC123",
+            grupo: "Grupo Teste",
+            classe: "Classe Teste",
+            material: "Material Teste",
+            elemento: "Elemento 123",
+            natureza: "Natureza Teste",
+        });
 
         (useAuth as jest.Mock).mockReturnValue({ //autenticar usuário na tela
             isAuthenticated: true, 
@@ -137,9 +131,16 @@ describe("Requisition Page", () => {
     })
 
     it("should show product suggestions when typing", async () => {
-        // mock da resposta do getProducts
         (SearchBecService.getProducts as jest.Mock).mockResolvedValue({
             d: ["Caneta Azul", "Caneta Preta", "Caneta Vermelha"],
+        });
+        (SearchBecService.searchAndGetDetails as jest.Mock).mockResolvedValue({
+            cod_id: "ABC123",
+            grupo: "Grupo Teste",
+            classe: "Classe Teste",
+            material: "Material Teste",
+            elemento: "Elemento 123",
+            natureza: "Natureza Teste",
         });
 
         render(<RequisitionPage />);
@@ -165,13 +166,24 @@ describe("Requisition Page", () => {
             fireEvent.click(sugestao1)
         })
 
-        const infoProduto = screen.getByText(/informações do produto/i)
-        expect(infoProduto).toBeInTheDocument()
+        // aguarda o carregamento dos detalhes
+        await waitFor(() => {
+            const infoProduto = screen.getByText(/informações do produto/i)
+            expect(infoProduto).toBeInTheDocument()
+        });
     });
 
     it("should request product", async () => {
         (SearchBecService.getProducts as jest.Mock).mockResolvedValue({
             d: ["Caneta Azul", "Caneta Preta", "Caneta Vermelha"],
+        });
+        (SearchBecService.searchAndGetDetails as jest.Mock).mockResolvedValue({
+            cod_id: "ABC123",
+            grupo: "Grupo Teste",
+            classe: "Classe Teste",
+            material: "Material Teste",
+            elemento: "Elemento 123",
+            natureza: "Natureza Teste",
         });
 
         render(<RequisitionPage />);
@@ -182,7 +194,7 @@ describe("Requisition Page", () => {
         const inputQtd = screen.getByRole('spinbutton', {name: /quantidade\*/i})
         const comboCategoria = screen.getByRole('combobox', {name: /categoria\*/i})
         const inputDescricao = screen.getByRole('textbox', {name: /descrição/i})
-        const btnEnviar = screen.getByRole('button', {name: /enviar/i})
+        const btnEnviar = screen.getByRole('button', {name: /requisitar/i})
 
         await act(async () => {
             fireEvent.change(input, { target: { value: "caneta" } });
@@ -195,6 +207,11 @@ describe("Requisition Page", () => {
             fireEvent.click(sugestao)
         })
 
+        // aguarda o carregamento dos detalhes do produto
+        await waitFor(() => {
+            expect(SearchBecService.searchAndGetDetails).toHaveBeenCalled();
+        });
+
         fireEvent.change(inputQtd, { target: { value: 5 }})
 
         await act(async () => {
@@ -205,13 +222,15 @@ describe("Requisition Page", () => {
 
         await act(async() => fireEvent.click(btnEnviar))
 
-        await(act(async() => expect(screen.getByText(/produto solicitado com sucesso!/i)).toBeInTheDocument()))
-    })
+        await waitFor(() => {
+            expect(screen.getByText(/produto solicitado com sucesso!/i)).toBeInTheDocument();
+        })
+    });
 
     it("should display validators on empty inputs", async () => {
         await act(() => {render(<RequisitionPage />)})
 
-        const btnEnviar = screen.getByRole('button', {name: /enviar/i})
+        const btnEnviar = screen.getByRole('button', {name: /requisitar/i})
 
         await act(async() => fireEvent.click(btnEnviar))
 
@@ -226,7 +245,11 @@ describe("Requisition Page", () => {
         
     })
     
-    it("should display product sugestion error", async() => {
+    it("should display product sugestion error when no suggestion is selected", async() => {
+        (SearchBecService.getProducts as jest.Mock).mockResolvedValue({
+            d: ["Caneta Azul", "Caneta Preta", "Caneta Vermelha"],
+        });
+
         render(<RequisitionPage />)
 
         const input = screen.getByRole("textbox", {
@@ -235,11 +258,11 @@ describe("Requisition Page", () => {
         const inputQtd = screen.getByRole('spinbutton', {name: /quantidade\*/i})
         const comboCategoria = screen.getByRole('combobox', {name: /categoria\*/i})
         const inputDescricao = screen.getByRole('textbox', {name: /descrição/i})
-        const btnEnviar = screen.getByRole('button', {name: /enviar/i})
+        const btnEnviar = screen.getByRole('button', {name: /requisitar/i})
 
+        // Type produto sem clicar em uma sugestão
         await act(async () => {
             fireEvent.change(input, { target: { value: "caneta" } });
-            jest.advanceTimersByTime(1000);
         });
 
         fireEvent.change(inputQtd, { target: { value: 5 }})

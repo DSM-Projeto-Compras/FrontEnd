@@ -331,12 +331,11 @@ const HistoricTemplate: React.FC = () => {
     <>
       <Header admin={false} data-test-id="productList" />
       <div className="p-4 mx-auto max-w-5xl pt-28 mb-14">
-        <div className="relative overflow shadow-md sm:rounded-lg">
-          <div className="flex flex-wrap mb-2">
+        <div className="flex flex-wrap mb-2">
             <h1 className="text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
               Históricos dos produtos requisitados
             </h1>
-            <div className="justify-end ml-96 relative inline-block text-left p-4">
+            <div className="justify-end md:ml-96 relative inline-block text-left p-4">
               <button
                 ref={buttonRef}
                 onClick={toggleFilter}
@@ -358,183 +357,191 @@ const HistoricTemplate: React.FC = () => {
                   />
                 </svg>
               </button>
-            </div>
-          </div>
-          {isFilterOpen && (
+              {isFilterOpen && (
             <FilterMenu
               onFilterChange={setFilters}
               resetFilters={resetFilters}
             />
           )}
+            </div>
+            
+          </div>
+          
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+          {/* wrapper para permitir scroll horizontal em telas pequenas */}
+          <div className="w-full overflow-x-auto">
+          
 
-          <table className="w-full text-sm text-left text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Nome
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Descrição
-                </th>
-                <th scope="col" className="px-2 py-3">
-                  QTD.
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Data
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Opções
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentProducts.map((product, index) => (
-                <tr key={product.id ?? index} className="bg-white border-b">
-                  <td className="px-6 py-4">
-                    {isTextTooLong(product.name) ? (
-                      <span className="flex font-medium">
-                        {product.name.slice(0, 20)}... &nbsp;
+            <table className="min-w-full table-auto text-sm text-left text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3">
+                    Nome
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Descrição
+                  </th>
+                  <th scope="col" className="px-2 py-3">
+                    QTD.
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Data
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Opções
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentProducts.map((product, index) => (
+
+                  <tr key={product.id ?? index} className="bg-white border-b">
+                    <td className="px-6 py-4">
+                      {isTextTooLong(product.name) ? (
+                        <span className="flex font-medium break-words">
+                          {product.name.slice(0, 20)}... &nbsp;
+                        </span>
+                      ) : (
+                        <span className="font-medium break-words">{product.name}</span>
+                      )}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {isTextTooLong(product.description) ? (
+                        <span className="flex break-words">
+                          {product.description.slice(0, 20)}... &nbsp;
+                        </span>
+                      ) : (
+                        <span className="break-words">{product.description}</span>
+                      )}
+                    </td>
+
+                    <td className="px-2 py-4">{product.quantity}</td>
+                    <td className="px-6 py-4">{formatDate(product.date)}</td>
+                    <td className="px-6 py-4">
+                      <span className="flex items-center text-sm font-medium text-gray-900">
+                        <span
+                          className={`w-3 h-3 me-3 rounded-full ${renderStatusDot(
+                            product.status
+                          )}`}
+                        />
+                        {product.status}
                       </span>
-                    ) : (
-                      <span className="font-medium">{product.name}</span>
-                    )}
-                  </td>
+                    </td>
 
-                  <td className="px-6 py-4">
-                    {isTextTooLong(product.description) ? (
-                      <span className="flex">
-                        {product.description.slice(0, 20)}... &nbsp;
-                      </span>
-                    ) : (
-                      <span>{product.description}</span>
-                    )}
-                  </td>
-
-                  <td className="px-2 py-4">{product.quantity}</td>
-                  <td className="px-6 py-4">{formatDate(product.date)}</td>
-                  <td className="px-6 py-4">
-                    <span className="flex items-center text-sm font-medium text-gray-900">
-                      <span
-                        className={`w-3 h-3 me-3 rounded-full ${renderStatusDot(
-                          product.status
-                        )}`}
-                      />
-                      {product.status}
-                    </span>
-                  </td>
-
-                  <td className="flex px-8 py-4 relative">
-                    <button
-                      id="dropdownButton"
-                      onClick={() => toggleProductMenu(product.id)}
-                      className="text-gray-500 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm p-1.5"
-                      type="button"
-                    >
-                      <span className="sr-only">Abrir menu</span>
-                      <svg
-                        className="w-5 h-5"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 16 3"
+                    <td className="flex px-8 py-4 relative w-32">
+                      <button
+                        id="dropdownButton"
+                        onClick={() => toggleProductMenu(product.id)}
+                        className="text-gray-500 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm p-1.5"
+                        type="button"
                       >
-                        <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-                      </svg>
-                    </button>
+                        <span className="sr-only">Abrir menu</span>
+                        <svg
+                          className="w-5 h-5"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="currentColor"
+                          viewBox="0 0 16 3"
+                        >
+                          <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
+                        </svg>
+                      </button>
 
-                    {activeProductMenu === product.id && (
-                      <div
-                        ref={menuRef}
-                        className="dropdown-menu absolute z-10 w-40 bg-white rounded divide-y divide-gray-100 shadow top-10"
-                      >
-                        <ul className="py-1 text-sm text-gray-700">
-                          {/* Condicional para as opções de acordo com o status */}
-                          <li>
-                            <a
-                              onClick={() => openDetailModal(product, false)}
-                              className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
-                            >
-                              Ver detalhes
-                            </a>
-                          </li>
-                          {product.status === "Pendente" && (
-                            <>
-                              <li>
-                                <a
-                                  onClick={() => openEditModal(product)}
-                                  className="flex cursor-pointer px-4 py-2 text-sm text-blue-700 hover:bg-gray-200"
-                                >
-                                  Editar &nbsp;
-                                  <svg
-                                    className="w-4 h-4"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      stroke="currentColor"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth="2"
-                                      d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                                    />
-                                  </svg>
-                                </a>
-                              </li>
-                              <li>
-                                <a
-                                  href="#"
-                                  className="flex cursor-pointer px-4 py-2 text-sm text-red-700 hover:bg-gray-200"
-                                  onClick={() =>
-                                    handleDeleteProduct(product.id)
-                                  }
-                                >
-                                  Cancelar &nbsp;
-                                  <svg
-                                    className="w-5 h-5"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      stroke="currentColor"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth="2"
-                                      d="M6 18 17.94 6M18 18 6.06 6"
-                                    />
-                                  </svg>
-                                </a>
-                              </li>
-                            </>
-                          )}
-                          {product.status === "Negado" && (
+                      {activeProductMenu === product.id && (
+                        <div
+                          ref={menuRef}
+                          className="dropdown-menu absolute z-50 w-40 bg-white rounded divide-y divide-gray-100 shadow top-10"
+                        >
+                          <ul className="py-1 text-sm text-gray-700">
+                            {/* Condicional para as opções de acordo com o status */}
                             <li>
                               <a
-                                onClick={() => openDetailModal(product, true)}
+                                onClick={() => openDetailModal(product, false)}
                                 className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
                               >
-                                Ver justificativa &nbsp;
+                                Ver detalhes
                               </a>
                             </li>
-                          )}
-                        </ul>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                            {product.status === "Pendente" && (
+                              <>
+                                <li>
+                                  <a
+                                    onClick={() => openEditModal(product)}
+                                    className="flex cursor-pointer px-4 py-2 text-sm text-blue-700 hover:bg-gray-200"
+                                  >
+                                    Editar &nbsp;
+                                    <svg
+                                      className="w-4 h-4"
+                                      aria-hidden="true"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                                      />
+                                    </svg>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a
+                                    href="#"
+                                    className="flex cursor-pointer px-4 py-2 text-sm text-red-700 hover:bg-gray-200"
+                                    onClick={() =>
+                                      handleDeleteProduct(product.id)
+                                    }
+                                  >
+                                    Cancelar &nbsp;
+                                    <svg
+                                      className="w-5 h-5"
+                                      aria-hidden="true"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M6 18 17.94 6M18 18 6.06 6"
+                                      />
+                                    </svg>
+                                  </a>
+                                </li>
+                              </>
+                            )}
+                            {product.status === "Negado" && (
+                              <li>
+                                <a
+                                  onClick={() => openDetailModal(product, true)}
+                                  className="flex cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
+                                >
+                                  Ver justificativa &nbsp;
+                                </a>
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div className="flex justify-between mt-4">
           <button

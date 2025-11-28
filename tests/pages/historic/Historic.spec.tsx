@@ -188,7 +188,7 @@ describe("Header Component", () => {
             name: /logo cps/i
         })
 
-        const abaProdutos = screen.getByText(/cadastrar produto/i);
+        const abaProdutos = screen.getByText(/realizar pedido/i);
         const abaHistorico = screen.getByText(/histórico/i);
 
         fireEvent.click(await abaProdutos);

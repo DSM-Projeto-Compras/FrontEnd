@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import React from "react";
 import { useFormik } from "formik";
-import { changePasswordValidationSchema } from "@/app/validators/changePasswordValidation";
+import { changePasswordValidationSchema } from "../../../../app/validators/changePasswordValidation";
 import Header from "../../organisms/Header";
 
 interface ChangePasswordAdminTemplateProps {
@@ -22,7 +23,7 @@ const ChangePasswordAdminTemplate = ({
       const success = await onSubmit(values.currentPassword, values.newPassword, values.confirmNewPassword);
 
       if(success){
-        helpers.resetForm;
+        helpers.resetForm();
       }
     }
 });

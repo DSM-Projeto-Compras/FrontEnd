@@ -37,8 +37,8 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
   };
 
   return (
-    <div className="origin-top-right absolute right-0 mt-2 w-auto rounded-md shadow-lg bg-white ring-2 ring-black ring-opacity-10 divide-y divide-gray-100 z-10">
-      <div className="py-1 flex">
+    <div className="origin-top-right absolute md:right-0 mt-2 w-auto rounded-md shadow-lg bg-white ring-2 ring-black ring-opacity-10 divide-y divide-gray-100 z-10">
+      <div className="py-1 flex flex-wrap md:flex-nowrap justify-center">
         <div className="w-60 px-4">
           {/* Filtro por Nome */}
           <div className="mt-2">
@@ -207,10 +207,10 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
           </div>
         </div>
       </div>
-
-      <div className="flex flex-col items-center mx-2 my-2">
+{/* mobile: data final abaixo da final */}
+      <div className="flex items-center md:mx-2 my-2 justify-center">
         {/* Filtro por data */}
-        <div className="flex items-center mb-3">
+        <div className="flex flex-wrap md:flex-nowrap items-center mb-3 justify-center">
           <div className="relative">
             <label
               htmlFor="startDate"
@@ -227,7 +227,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({
               className="block bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
             />
           </div>
-          <div className="relative ml-4">
+          <div className="relative md:ml-4 mt-2 md:mt-0">
             <label
               htmlFor="endDate"
               className="block text-sm font-medium text-gray-700"

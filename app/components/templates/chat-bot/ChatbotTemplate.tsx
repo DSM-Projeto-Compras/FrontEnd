@@ -13,6 +13,25 @@ export default function ChatbotTemplate() {
   const [hasGreeted, setHasGreeted] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
+  // Expõe funções globalmente para o VoiceTemplate usar
+  useEffect(() => {
+    // @ts-ignore
+    window.chatbotSendMessage = (message: string) => {
+      if (isOpen) {
+        sendMessageFromVoice(message);
+      }
+    };
+    // @ts-ignore
+    window.isChatbotOpen = () => isOpen;
+
+    return () => {
+      // @ts-ignore
+      delete window.chatbotSendMessage;
+      // @ts-ignore
+      delete window.isChatbotOpen;
+    };
+  }, [isOpen, messages]);
+
   // Scroll automático para o final das mensagens
   useEffect(() => {
     if (chatRef.current) {
@@ -64,6 +83,40 @@ export default function ChatbotTemplate() {
     }
 
     setInputValue("");
+  };
+
+  // Função para enviar mensagem de voz
+  const sendMessageFromVoice = async (messageText: string) => {
+    if (!messageText.trim()) return;
+
+    const userMessage: Message = {
+      type: "user",
+      content: messageText
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+
+    try {
+      const result = await ChatService.sendMessage(messageText);
+
+      const botMessage: Message = {
+        type: "bot",
+        content: result.reply
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+      
+      // Lê a resposta do bot em voz alta
+      const utterance = new SpeechSynthesisUtterance(result.reply);
+      utterance.lang = 'pt-BR';
+      window.speechSynthesis.speak(utterance);
+    } catch (error) {
+      const errorMessage: Message = {
+        type: "bot",
+        content: "Desculpe, ocorreu um erro. Tente novamente."
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
