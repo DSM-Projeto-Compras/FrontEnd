@@ -188,7 +188,7 @@ describe("Register Page Elements", () => {
         fireEvent.click(btnRegister);
 
 
-        const erroemail = await screen.findByText("Apenas emails institucionais da Fatec (@fatec.sp.gov.br) são permitidos");
+        const erroemail = await screen.findByText("Apenas emails institucionais da Fatec");
 
         expect(erroemail).toBeVisible()
 

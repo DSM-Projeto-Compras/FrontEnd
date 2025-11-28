@@ -4,7 +4,6 @@ import axios from 'axios';
 const API_BASE = process.env.NEXT_PUBLIC_API_BASEURL || '';
 
 const SearchBecService = {
-  // Keep the same return shape used by the client (old BEC .asmx returned { d: [...] })
   getProducts: async (prefixText: string, count: number = 20) => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
@@ -21,7 +20,6 @@ const SearchBecService = {
     }
   },
 
-  // Request combined search+details from backend which returns structured JSON
   searchAndGetDetails: async (description: string) => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
@@ -30,7 +28,6 @@ const SearchBecService = {
         { description },
         { headers: token ? { 'access-token': token } : undefined }
       );
-      // resp.data should contain .details (see controller)
       return resp.data?.details || null;
     } catch (error) {
       console.error('Erro searchAndGetDetails (proxy):', error);

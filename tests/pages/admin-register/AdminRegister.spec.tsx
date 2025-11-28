@@ -212,7 +212,7 @@ describe("Register Admin Page Elements", () => {
         mockRegister.mockRejectedValue({
             response: { data: 
                 { errors: [
-                    { msg: "Apenas emails institucionais da Fatec (@fatec.sp.gov.br) são permitidos" },
+                    { msg: "Apenas emails institucionais da Fatec" },
                 ]} 
             }
         })
@@ -239,7 +239,7 @@ describe("Register Admin Page Elements", () => {
 
         await act(() => fireEvent.click(screen.getByRole("button", { name: /criar conta/i })))
 
-        const msg = screen.getByText( /apenas emails institucionais da fatec \(@fatec\.sp\.gov\.br\) são permitidos/i)
+        const msg = screen.getByText( /apenas emails institucionais da fatec/i)
         // const msg2 = await screen.findByText("A senha é obrigatória")
         // const msg3 = await screen.findByText("O nome é obrigatório")
         expect(msg).toBeVisible()

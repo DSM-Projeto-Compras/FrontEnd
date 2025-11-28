@@ -2,8 +2,8 @@
 
 import React from "react";
 import { useFormik } from "formik";
-import { forgotStep1Validation } from "@/app/validators/forgotStep1Validation";
-import { forgotStep2Validation } from "@/app/validators/forgotStep2Validation";
+import { forgotStep1Validation } from "../../../../app/validators/forgotStep1Validation";
+import { forgotStep2Validation } from "../../../../app/validators/forgotStep2Validation";
 import Header from "../../molecules/HeaderLogin";
 
 interface Props {

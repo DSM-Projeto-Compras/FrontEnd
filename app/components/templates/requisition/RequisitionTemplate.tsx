@@ -276,7 +276,7 @@ const RequisitionTemplate: React.FC = () => {
                 />
               </div>
               <div className="flex items-center justify-center sm:place-items-start sm:justify-normal">
-                <Button type="submit">Enviar</Button>
+                <Button type="submit">Requisitar</Button>
 
                 {errorMessage && (
                   <div className="flex flex-col w-full items-center px-5 py-2.5 ml-5 mt-4 border-red-200 border bg-red-100 rounded-xl text-sm">
