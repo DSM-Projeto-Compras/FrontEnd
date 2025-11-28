@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Header from "../../organisms/Header";
 import FilterMenu, { FilterValues } from "../../organisms/Filter";
 import RequisitonService from "../../../services/requisitionService";
+import { toast } from "react-toastify";
 
 interface Product {
   id: string;
@@ -37,14 +38,17 @@ const HistoricTemplate: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       // Verifica se o clique não foi no botão dropdown nem em nenhum elemento dentro do menu
-      if (!target.closest('#dropdownButton') && !target.closest('.dropdown-menu')) {
+      if (
+        !target.closest("#dropdownButton") &&
+        !target.closest(".dropdown-menu")
+      ) {
         setActiveProductMenu(null);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -173,7 +177,6 @@ const HistoricTemplate: React.FC = () => {
     if (editingProduct) {
       try {
         // Chama o service para atualizar o produto
-        console.log(editingProduct.id);
         await RequisitonService.updateProduct({
           id: editingProduct.id,
           descricao: editDescription,
@@ -203,9 +206,11 @@ const HistoricTemplate: React.FC = () => {
               : product
           )
         );
+        toast.success("Produto editado com sucesso!");
         closeEditModal();
       } catch (error) {
         console.error("Erro ao editar produto:", error);
+        toast.error("Erro ao editar produto. Tente novamente.");
       }
     }
   };
@@ -315,14 +320,16 @@ const HistoricTemplate: React.FC = () => {
       setFilteredProducts((prevFilteredProducts) =>
         prevFilteredProducts.filter((product) => product.id !== productId)
       );
+      toast.success("Pedido cancelado com sucesso!");
     } catch (error) {
       console.error("Erro ao deletar produto:", error);
+      toast.error("Erro ao cancelar pedido. Tente novamente.");
     }
   };
 
   return (
     <>
-      <Header admin={false} data-test-id="productList"/>
+      <Header admin={false} data-test-id="productList" />
       <div className="p-4 mx-auto max-w-5xl pt-28 mb-14">
         <div className="flex flex-wrap mb-2">
             <h1 className="text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">

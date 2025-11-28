@@ -5,6 +5,7 @@ import { useAuth } from "../../../app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import AdminService from "../../../app/services/adminService";
+import { toast } from "react-toastify";
 
 const AdminUsersPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -17,15 +18,13 @@ const AdminUsersPage: React.FC = () => {
   }, [isAuthenticated, loading, router]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este administrador?")) return;
-
     try {
       await AdminService.deleteUser(id);
-      alert("Administrador removido com sucesso!");
+      toast.success("Administrador removido com sucesso!");
       window.location.reload();
     } catch (error) {
       console.log("Erro ao excluir administrador:", error);
-      alert("Não é permitido excluir administradores mais antigos.");
+      toast.error("Não é permitido excluir administradores mais antigos.");
     }
   };
 

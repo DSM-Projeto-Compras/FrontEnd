@@ -5,8 +5,7 @@ import Header from "../../molecules/HeaderLogin";
 
 const LoginTemplate: React.FC<{
   onLogin: (email: string, password: string, remember: boolean) => void;
-  errorMessage?: string;
-}> = ({ onLogin, errorMessage }) => {
+}> = ({ onLogin }) => {
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -38,11 +37,6 @@ const LoginTemplate: React.FC<{
                     onSubmit={handleSubmit}
                     className="space-y-4 md:space-y-6"
                   >
-                    {errorMessage && (
-                      <div className="text-red-500 text-sm mb-2">
-                        {errorMessage}
-                      </div>
-                    )}
                     <div>
                       <label
                         htmlFor="email"
@@ -99,7 +93,7 @@ const LoginTemplate: React.FC<{
                     </div>
 
                     <div>
-                      <p className="text-sm text-gray-600">Esqueceu a senha? <a href="change-password" className="font-medium text-blue-600 hover:text-blue-500">Clique aqui</a></p>
+                      <p className="text-sm text-gray-600">Esqueceu a senha? <a href="/pages/change-password" className="font-medium text-blue-600 hover:text-blue-500">Clique aqui</a></p>
                     </div>
 
                     <div className="flex flex-wrap items-center">
@@ -133,7 +127,7 @@ const LoginTemplate: React.FC<{
                     <p className="text-center text-sm text-gray-600 mt-4">
                       Não possui conta?{" "}
                       <a
-                        href="register"
+                        href="/pages/register"
                         className="font-medium text-blue-600 hover:text-blue-500"
                       >
                         Cadastre-se

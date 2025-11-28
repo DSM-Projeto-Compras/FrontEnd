@@ -5,16 +5,16 @@ import { useAuth } from "../../../app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminService from "../../../app/services/adminService";
+import { toast } from "react-toastify";
 
 const AdminRegisterPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-  const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [showSucessModal, setShowSucessModal] = useState(false);
 
   const handleModalClose = () => {
     setShowSucessModal(false);
-    router.push("admin-users");
+    router.push("/pages/admin-users");
   }
 
   useEffect(() => {
@@ -33,11 +33,11 @@ const AdminRegisterPage: React.FC = () => {
   ) => {
     const token = localStorage.getItem("access_token");
      if (!token) {
-      setErrorMessages(["Token inválido. Faça login novamente."]);
+      toast.error("Token inválido. Faça login novamente.");
       return;
     }
     if (senha !== confirmarSenha) {
-      setErrorMessages(["As senhas não coincidem. Por favor, verifique."]);
+      toast.error("As senhas não coincidem. Por favor, verifique.");
       return;
     }
 
@@ -55,13 +55,11 @@ const AdminRegisterPage: React.FC = () => {
         error.response.data &&
         Array.isArray(error.response.data.errors)
       ) {
-        setErrorMessages(
-          error.response.data.errors.map((err: { msg: string }) => err.msg)
-        );
+        error.response.data.errors.forEach((err: { msg: string }) => {
+          toast.error(err.msg);
+        });
       } else {
-        setErrorMessages([
-          "Ocorreu um erro durante o cadastro. Por favor, tente novamente mais tarde.",
-        ]);
+        toast.error("Ocorreu um erro durante o cadastro. Por favor, tente novamente mais tarde.");
       }
       console.error("Erro no registro:", error);
     }
@@ -71,7 +69,6 @@ const AdminRegisterPage: React.FC = () => {
     isAuthenticated && (
       <AdminRegisterTemplate
         onRegister={handleRegister}
-        errorMessages={errorMessages}
         showSucessModal={showSucessModal}
         onSucessModalClose={handleModalClose}
       />

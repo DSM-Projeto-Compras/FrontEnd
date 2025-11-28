@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ admin = true }) => {
     router.push("/");
   };
   const navigateTo = (path: string) => {
-    router.push(path);
+    router.push(`/pages/${path}`);
   };
 
   return (

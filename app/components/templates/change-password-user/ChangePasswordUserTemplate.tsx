@@ -15,8 +15,6 @@ interface Props {
   setCodigo: (value: string) => void;
   novaSenha: string;
   setNovaSenha: (value: string) => void;
-  mensagem: string;
-  erro: string;
   handleSendEmail: () => void;
   handleResetPassword: () => void;
 }
@@ -30,8 +28,6 @@ const ChangePasswordUserTemplate: React.FC<Props> = ({
   setCodigo,
   novaSenha,
   setNovaSenha,
-  mensagem,
-  erro,
   handleSendEmail,
   handleResetPassword,
 }) => {
@@ -70,9 +66,6 @@ const ChangePasswordUserTemplate: React.FC<Props> = ({
               {step === 2 && "Redefina a senha"}
               {step === 3 && "Senha alterada com sucesso"}
             </h1>
-
-            {erro && <p className="text-red-500 text-sm">{erro}</p>}
-            {mensagem && <p className="text-green-600 text-sm">{mensagem}</p>}
 
             {step === 1 && (
               <form onSubmit={formik.handleSubmit} className="space-y-4">
@@ -156,7 +149,7 @@ const ChangePasswordUserTemplate: React.FC<Props> = ({
             {step === 3 && (
               <div className="text-center">
                 <p className="text-green-700 font-medium">
-                  <a href="login" className="text-blue-700 hover:underline text-sm">
+                  <a href="/pages/login" className="text-blue-700 hover:underline text-sm">
                     Volte para o login
                   </a>{" "}
                   e entre com sua nova senha!

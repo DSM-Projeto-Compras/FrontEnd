@@ -23,10 +23,29 @@ const AdminUsersTemplate: React.FC<AdminUsersTemplateProps> = ({ onDelete }) => 
     const router = useRouter(); 
     const [admins, setAdmins] = useState<AdminUser[]>([]);
     const { user } = useAuth();
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deletingAdmin, setDeletingAdmin] = useState<AdminUser | null>(null);
 
     const navigateTo = (path: string) => {
-        router.push(path);
+        router.push(`/pages/${path}`);
     }
+
+    const openDeleteModal = (admin: AdminUser) => {
+        setDeletingAdmin(admin);
+        setIsDeleteModalOpen(true);
+    };
+
+    const closeDeleteModal = () => {
+        setIsDeleteModalOpen(false);
+        setDeletingAdmin(null);
+    };
+
+    const handleConfirmDelete = () => {
+        if (deletingAdmin) {
+            onDelete(deletingAdmin._id);
+            closeDeleteModal();
+        }
+    };
 
     useEffect(() => {
         const fetchAdmins = async () => {
@@ -85,7 +104,7 @@ const AdminUsersTemplate: React.FC<AdminUsersTemplateProps> = ({ onDelete }) => 
                                             </svg>
                                         </button>
                                     )}
-                                    <button className="text-red-500 hover:underline" onClick={() => onDelete(admin._id)} title="Deletar Usuário">
+                                    <button className="text-red-500 hover:underline" onClick={() => openDeleteModal(admin)} title="Deletar Usuário">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 -960 960 960" width="36px" fill="black">
                                             <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
                                         </svg>
@@ -100,6 +119,33 @@ const AdminUsersTemplate: React.FC<AdminUsersTemplateProps> = ({ onDelete }) => 
                 </div>
                 <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded" onClick={() => navigateTo("admin-register") }>Adicionar administrador</button>
             </div>
+
+            {/* Modal de confirmação de exclusão */}
+            {isDeleteModalOpen && deletingAdmin && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-6 rounded-md shadow-md">
+                        <h2 className="text-xl font-semibold mb-4">Excluir Administrador</h2>
+                        <p>
+                            Tem certeza que deseja excluir o administrador{" "}
+                            <strong>{deletingAdmin.nome}</strong>?
+                        </p>
+                        <div className="flex justify-end mt-4 gap-2">
+                            <button
+                                className="bg-gray-500 text-white px-4 py-2 rounded"
+                                onClick={closeDeleteModal}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                className="bg-red-500 text-white px-4 py-2 rounded"
+                                onClick={handleConfirmDelete}
+                            >
+                                Confirmar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

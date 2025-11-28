@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import AdminService from "../../../app/services/adminService";
 import ChangePasswordAdminTemplate from "../../../app/components/templates/change-password-admin/ChangePasswordAdminTemplate";
+import { toast } from "react-toastify";
 
 const AdminPasswordPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-
-  const [mensagem, setMensagem] = useState("");
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -32,11 +31,11 @@ const AdminPasswordPage: React.FC = () => {
         confirmNewPassword
       );
 
-      setMensagem(data.message || "Senha alterada com sucesso!");
-      router.push("admin-users")
+      toast.success(data.message || "Senha alterada com sucesso!");
+      router.push("/pages/admin-users")
       return true;
     } catch (error: any) {
-      setMensagem(error.response?.data?.message || "Erro ao alterar senha.");
+      toast.error(error.response?.data?.message || "Erro ao alterar senha.");
       return false;
     }
   };
@@ -44,7 +43,6 @@ const AdminPasswordPage: React.FC = () => {
   return (
     <ChangePasswordAdminTemplate
       onSubmit={handleSubmit}
-      mensagem={mensagem}
     />
   );
 };

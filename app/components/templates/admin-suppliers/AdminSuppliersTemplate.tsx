@@ -6,6 +6,7 @@ import { supplierValidationSchema } from "../../../validators/supplierValidation
 import TextFieldWrapper from "../../molecules/TextFieldWrapper";
 import Button from "../../atoms/Button";
 import { cnpjMask, cepMask, phoneMask } from "../../../utils/masks";
+import { toast } from "react-toastify";
 
 interface Supplier {
   id: string;
@@ -38,22 +39,27 @@ const AdminSuppliersTemplate: React.FC = () => {
   const [suppliersPerPage] = useState<number>(7);
   const [allSuppliers, setAllSuppliers] = useState<Supplier[]>([]);
   const [filteredSuppliers, setFilteredSuppliers] = useState<Supplier[]>([]);
-  const [activeSupplierMenu, setActiveSupplierMenu] = useState<string | null>(null);
+  const [activeSupplierMenu, setActiveSupplierMenu] = useState<string | null>(
+    null
+  );
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
-  const [deletingSupplier, setDeletingSupplier] = useState<Supplier | null>(null);
+  const [deletingSupplier, setDeletingSupplier] = useState<Supplier | null>(
+    null
+  );
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest("#dropdownButton") && !target.closest(".dropdown-menu")) {
+      if (
+        !target.closest("#dropdownButton") &&
+        !target.closest(".dropdown-menu")
+      ) {
         setActiveSupplierMenu(null);
       }
     };
@@ -115,29 +121,21 @@ const AdminSuppliersTemplate: React.FC = () => {
   }, [searchTerm, allSuppliers]);
 
   const openCreateModal = () => {
-    setErrorMessage("");
-    setSuccessMessage("");
     setIsCreateModalOpen(true);
     setActiveSupplierMenu(null);
   };
 
   const closeCreateModal = () => {
-    setErrorMessage("");
-    setSuccessMessage("");
     setIsCreateModalOpen(false);
   };
 
   const openEditModal = (supplier: Supplier) => {
-    setErrorMessage("");
-    setSuccessMessage("");
     setEditingSupplier(supplier);
     setIsEditModalOpen(true);
     setActiveSupplierMenu(null);
   };
 
   const closeEditModal = () => {
-    setErrorMessage("");
-    setSuccessMessage("");
     setIsEditModalOpen(false);
     setEditingSupplier(null);
   };
@@ -155,42 +153,34 @@ const AdminSuppliersTemplate: React.FC = () => {
 
   const handleCreateSubmit = async (values: SupplierFormValues) => {
     try {
-      setErrorMessage("");
-      setSuccessMessage("");
       await SupplierService.createSupplier(values);
       await fetchSuppliers();
-      setSuccessMessage("Fornecedor cadastrado com sucesso!");
-      setTimeout(() => {
-        closeCreateModal();
-        setSuccessMessage("");
-      }, 1500);
+      toast.success("Fornecedor cadastrado com sucesso!");
+      closeCreateModal();
     } catch (error: any) {
       console.error("Erro ao criar fornecedor:", error);
-      const errorMsg = error.response?.data?.message || 
-                       error.response?.data?.errors?.[0]?.msg ||
-                       "Erro ao cadastrar fornecedor. Verifique os dados.";
-      setErrorMessage(errorMsg);
+      const errorMsg =
+        error.response?.data?.message ||
+        error.response?.data?.errors?.[0]?.msg ||
+        "Erro ao cadastrar fornecedor. Verifique os dados.";
+      toast.error(errorMsg);
     }
   };
 
   const handleEditSubmit = async (values: SupplierFormValues) => {
     if (editingSupplier) {
       try {
-        setErrorMessage("");
-        setSuccessMessage("");
         await SupplierService.updateSupplier(editingSupplier.id, values);
         await fetchSuppliers();
-        setSuccessMessage("Fornecedor atualizado com sucesso!");
-        setTimeout(() => {
-          closeEditModal();
-          setSuccessMessage("");
-        }, 1500);
+        toast.success("Fornecedor atualizado com sucesso!");
+        closeEditModal();
       } catch (error: any) {
         console.error("Erro ao atualizar fornecedor:", error);
-        const errorMsg = error.response?.data?.message || 
-                         error.response?.data?.errors?.[0]?.msg ||
-                         "Erro ao atualizar fornecedor. Verifique os dados.";
-        setErrorMessage(errorMsg);
+        const errorMsg =
+          error.response?.data?.message ||
+          error.response?.data?.errors?.[0]?.msg ||
+          "Erro ao atualizar fornecedor. Verifique os dados.";
+        toast.error(errorMsg);
       }
     }
   };
@@ -200,9 +190,11 @@ const AdminSuppliersTemplate: React.FC = () => {
       try {
         await SupplierService.deleteSupplier(deletingSupplier.id);
         await fetchSuppliers();
+        toast.success("Fornecedor excluído com sucesso!");
         closeDeleteModal();
       } catch (error) {
         console.error("Erro ao excluir fornecedor:", error);
+        toast.error("Erro ao excluir fornecedor.");
       }
     }
   };
@@ -213,7 +205,7 @@ const AdminSuppliersTemplate: React.FC = () => {
   ) => {
     const maskedValue = cepMask(e.target.value);
     setFieldValue("cep", maskedValue);
-    
+
     if (maskedValue && maskedValue.replace(/\D/g, "").length === 8) {
       try {
         const addressData = await SupplierService.getAddressByCep(maskedValue);
@@ -322,7 +314,9 @@ const AdminSuppliersTemplate: React.FC = () => {
                   <td className="px-6 py-4">{supplier.cnpj}</td>
                   <td className="px-6 py-4">{supplier.cidade || "-"}</td>
                   <td className="px-6 py-4">{supplier.telefone || "-"}</td>
-                  <td className="px-6 py-4">{formatDate(supplier.dataCriacao)}</td>
+                  <td className="px-6 py-4">
+                    {formatDate(supplier.dataCriacao)}
+                  </td>
                   <td className="flex px-8 py-4 relative">
                     <button
                       id="dropdownButton"
@@ -485,19 +479,7 @@ const AdminSuppliersTemplate: React.FC = () => {
                       onChange={(e) => handlePhoneChange(e, setFieldValue)}
                     />
                   </div>
-                  
-                  {errorMessage && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                      {errorMessage}
-                    </div>
-                  )}
-                  
-                  {successMessage && (
-                    <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-                      {successMessage}
-                    </div>
-                  )}
-                  
+
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"
@@ -615,19 +597,7 @@ const AdminSuppliersTemplate: React.FC = () => {
                       onChange={(e) => handlePhoneChange(e, setFieldValue)}
                     />
                   </div>
-                  
-                  {errorMessage && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                      {errorMessage}
-                    </div>
-                  )}
-                  
-                  {successMessage && (
-                    <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-                      {successMessage}
-                    </div>
-                  )}
-                  
+
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"

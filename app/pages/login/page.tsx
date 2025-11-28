@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import LoginTemplate from "../../components/templates/login/LoginTemplate";
+import { toast } from "react-toastify";
 
 const LoginPage: React.FC = () => {
-  const [errorMessage, setErrorMessage] = useState("");
   const { login } = useAuth();
 
   const handleLogin = async (
@@ -16,11 +16,11 @@ const LoginPage: React.FC = () => {
     try {
       await login(email, password, remember);
     } catch (error) {
-      setErrorMessage("Erro ao fazer login. Verifique suas credenciais.");
+      toast.error("Erro ao fazer login. Verifique suas credenciais.");
     }
   };
 
-  return <LoginTemplate onLogin={handleLogin} errorMessage={errorMessage} />;
+  return <LoginTemplate onLogin={handleLogin} />;
 };
 
 export default LoginPage;
