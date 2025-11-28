@@ -1,10 +1,11 @@
-"use client"; // Garantir que este código seja executado no lado do cliente
+"use client"; 
 
 import { useEffect } from "react";
-import Hotjar from "@hotjar/browser"; // Importar o Hotjar
+import Hotjar from "@hotjar/browser"; 
 import "./globals.css";
 import { ReactNode } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
+import { VoiceProvider } from "./contexts/VoiceContext";
 import { usePathname } from "next/navigation";
 
 interface RootLayoutProps {
@@ -27,7 +28,11 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <VoiceProvider>
+            {children}
+          </VoiceProvider>
+        </AuthProvider>
       </body>
     </html>
   );
